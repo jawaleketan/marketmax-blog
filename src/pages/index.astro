@@ -34,7 +34,11 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       </div>
       {recentPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recentPosts.map((post) => <BlogCard post={post} />)}
+          {recentPosts.map((post, i) => (
+            <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
+              <BlogCard post={post} />
+            </div>
+          ))}
         </div>
       ) : (
         <div class="col-span-full text-center py-12 text-text-muted"><p class="text-lg">No articles yet. Check back soon!</p></div>

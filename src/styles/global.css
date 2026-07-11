@@ -13,9 +13,9 @@
   --color-text-secondary: #a1a1aa;
   --color-text-muted: #6b6b77;
 
-  /* Accent colors */
-  --color-accent-primary: #38bdf8;
-  --color-accent-hover: #7dd3fc;
+  /* Accent colors — warm amber/gold palette */
+  --color-accent-primary: #f59e0b;
+  --color-accent-hover: #fbbf24;
 
   /* Border colors */
   --color-border-default: #27272a;
@@ -31,6 +31,17 @@
   --color-tag-content: #f59e0b;
   --color-tag-ppc: #3b82f6;
   --color-tag-analytics: #ec4899;
+}
+
+/* ─── Background Dot Grid Pattern ─── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
 }
 
 /* ─── Base Styles ─── */
@@ -90,19 +101,19 @@ body {
 
 .prose hr { border-color: var(--color-border-default); margin: 2rem 0; }
 
-/* ─── Reading Progress Bar ─── */
+/* ─── Reading Progress Bar (amber) ─── */
 #progress-bar {
   position: fixed;
   top: 0;
   left: 0;
-  height: 2px;
+  height: 3px;
   background: linear-gradient(90deg, var(--color-accent-primary), var(--color-accent-hover));
   z-index: 9999;
   width: 0%;
   transition: width 50ms linear;
 }
 
-/* ─── Scroll-to-Top Button ─── */
+/* ─── Scroll-to-Top Button (amber) ─── */
 #scroll-top-btn {
   position: fixed;
   bottom: 2rem;
@@ -116,7 +127,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);
   opacity: 0;
   pointer-events: none;
   transform: translateY(10px);
@@ -131,7 +142,7 @@ body {
 }
 #scroll-top-btn:hover {
   background-color: var(--color-accent-hover);
-  box-shadow: 0 6px 24px rgba(56, 189, 248, 0.4);
+  box-shadow: 0 6px 24px rgba(245, 158, 11, 0.4);
 }
 
 /* ─── Animated Mobile Menu ─── */
@@ -152,20 +163,28 @@ body {
 
 /* ─── Category Page Gradient Banners ─── */
 .category-banner-seo {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), transparent 70%);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), transparent 70%);
 }
 .category-banner-social-media {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), transparent 70%);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), transparent 70%);
 }
 .category-banner-content-marketing {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), transparent 70%);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), transparent 70%);
 }
 .category-banner-ppc {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), transparent 70%);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), transparent 70%);
 }
 .category-banner-analytics {
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), transparent 70%);
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.12), transparent 70%);
 }
+
+/* ─── Card stagger animation delay helpers ─── */
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.1s; }
+.delay-3 { animation-delay: 0.15s; }
+.delay-4 { animation-delay: 0.2s; }
+.delay-5 { animation-delay: 0.25s; }
+.delay-6 { animation-delay: 0.3s; }
 
 /* ─── Utilities ─── */
 .container-blog { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
@@ -177,3 +196,8 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in-up { animation: fade-in-up 0.4s ease-out both; }
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
