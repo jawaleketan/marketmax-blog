@@ -22,7 +22,7 @@ const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hove
   <a href={`/blog/${post.id}`} class="block">
     {post.data.image && (
       <div class="aspect-[16/9] overflow-hidden bg-bg-surface">
-        <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" loading="lazy" />
+        <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
       </div>
     )}
     <div class="p-5 sm:p-6">

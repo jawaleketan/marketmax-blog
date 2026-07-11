@@ -33,11 +33,11 @@ const currentPath = Astro.url.pathname;
     </nav>
 
     <div class="flex items-center gap-1">
-      <a href="/blog" class="hidden sm:flex w-8 h-8 items-center justify-center rounded-md text-text-muted hover:text-accent-primary hover:bg-bg-card transition-all" aria-label="Search articles">
+      <button onclick="window.__openSearch()" class="hidden sm:flex w-8 h-8 items-center justify-center rounded-md text-text-muted hover:text-accent-primary hover:bg-bg-card transition-all" aria-label="Search articles (Ctrl+K)">
         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
         </svg>
-      </a>
+      </button>
       <button id="theme-toggle" onclick="window.__themeToggle()" class="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-accent-primary hover:bg-bg-card transition-all" aria-label="Toggle theme">
         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -77,15 +77,22 @@ const currentPath = Astro.url.pathname;
     const iconClose = document.getElementById("menu-icon-close");
     if (!toggle || !menu) return;
 
+    var focusableLinks = menu.querySelectorAll("a");
+    var lastFocused = null;
+
     function openMenu() {
       menu.classList.add("open");
       iconOpen?.classList.add("hidden");
       iconClose?.classList.remove("hidden");
+      lastFocused = document.activeElement;
+      var first = focusableLinks[0];
+      if (first) setTimeout(function() { first.focus(); }, 50);
     }
     function closeMenu() {
       menu.classList.remove("open");
       iconOpen?.classList.remove("hidden");
       iconClose?.classList.add("hidden");
+      if (lastFocused) { lastFocused.focus(); lastFocused = null; }
     }
 
     toggle.addEventListener("click", () => {
@@ -93,6 +100,21 @@ const currentPath = Astro.url.pathname;
     });
 
     menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+
+    menu.addEventListener("keydown", function(e) {
+      if (e.key !== "Tab") return;
+      var links = Array.from(focusableLinks);
+      if (links.length === 0) return;
+      var first = links[0];
+      var last = links[links.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
 
     document.addEventListener("click", (e) => {
       if (!toggle.contains(e.target) && !menu.contains(e.target)) closeMenu();

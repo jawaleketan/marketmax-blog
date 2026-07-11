@@ -1,0 +1,157 @@
+<div id="search-overlay" class="search-overlay" role="dialog" aria-modal="true" aria-label="Search articles">
+  <div class="search-overlay-backdrop"></div>
+  <div class="search-overlay-panel">
+    <div class="search-overlay-header">
+      <div class="search-overlay-input-wrapper">
+        <svg class="search-overlay-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input id="search-overlay-input" type="text" placeholder="$ search articles..." autocomplete="off" autocorrect="off" spellcheck="false" />
+        <kbd class="search-overlay-kbd">ESC</kbd>
+      </div>
+    </div>
+    <div id="search-overlay-results" class="search-overlay-results">
+      <div class="search-overlay-hint">Type at least 2 characters to search</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var overlay = document.getElementById("search-overlay");
+    var input = document.getElementById("search-overlay-input");
+    var results = document.getElementById("search-overlay-results");
+    var pagefindLoaded = false;
+
+    function openSearch() {
+      if (!overlay || !input) return;
+      overlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+      setTimeout(function() { input.focus(); }, 100);
+      if (!pagefindLoaded) {
+        loadPagefind();
+      }
+    }
+
+    function closeSearch() {
+      if (!overlay) return;
+      overlay.classList.remove("open");
+      document.body.style.overflow = "";
+      if (input) input.value = "";
+      if (results) results.innerHTML = '<div class="search-overlay-hint">Type at least 2 characters to search</div>';
+    }
+
+    function loadPagefind() {
+      if (pagefindLoaded) return;
+      var script = document.createElement("script");
+      script.src = "/pagefind/pagefind.js";
+      script.async = true;
+      script.onload = function() { pagefindLoaded = true; };
+      document.head.appendChild(script);
+    }
+
+    window.__openSearch = openSearch;
+    window.__closeSearch = closeSearch;
+
+    document.addEventListener("keydown", function(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        if (overlay && overlay.classList.contains("open")) {
+          closeSearch();
+        } else {
+          openSearch();
+        }
+      }
+      if (e.key === "Escape" && overlay && overlay.classList.contains("open")) {
+        closeSearch();
+      }
+    });
+
+    if (overlay) {
+      overlay.addEventListener("click", function(e) {
+        if (e.target === overlay || e.target.classList.contains("search-overlay-backdrop")) {
+          closeSearch();
+        }
+      });
+    }
+
+    if (input && results) {
+      var debounceTimer;
+      input.addEventListener("input", function() {
+        clearTimeout(debounceTimer);
+        var query = input.value.trim();
+        if (query.length < 2) {
+          results.innerHTML = '<div class="search-overlay-hint">Type at least 2 characters to search</div>';
+          return;
+        }
+        debounceTimer = setTimeout(function() {
+          performSearch(query);
+        }, 200);
+      });
+
+      input.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") closeSearch();
+        var items = results.querySelectorAll("a");
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          var first = items[0];
+          if (first) first.focus();
+        }
+      });
+
+      results.addEventListener("keydown", function(e) {
+        var items = Array.from(results.querySelectorAll("a"));
+        if (items.length === 0) return;
+        var currentIdx = items.indexOf(document.activeElement);
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          var next = (currentIdx + 1) % items.length;
+          items[next].focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          var prev = currentIdx <= 0 ? items.length - 1 : currentIdx - 1;
+          items[prev].focus();
+        } else if (e.key === "Escape") {
+          closeSearch();
+        }
+      });
+    }
+
+    async function performSearch(query) {
+      if (typeof window.Pagefind === "undefined" || !window.Pagefind) {
+        results.innerHTML = '<div class="search-overlay-hint">Loading search index...</div>';
+        if (!pagefindLoaded) loadPagefind();
+        var checkReady = setInterval(function() {
+          if (typeof window.Pagefind !== "undefined" && window.Pagefind) {
+            clearInterval(checkReady);
+            performSearch(query);
+          }
+        }, 300);
+        setTimeout(function() { clearInterval(checkReady); }, 10000);
+        return;
+      }
+      try {
+        var search = await window.Pagefind.search(query);
+        if (!search || !search.results || search.results.length === 0) {
+          results.innerHTML = '<div class="search-overlay-empty">// no results for "' + query + '"</div>';
+          return;
+        }
+        var items = await Promise.all(search.results.slice(0, 8).map(async function(r) {
+          var data = await r.data();
+          var cat = data.meta && data.meta.category ? data.meta.category : "";
+          var catBadge = cat ? '<span class="search-result-cat">' + cat + "</span>" : "";
+          return '<a href="' + data.url + '" class="search-result-item" tabindex="0">' +
+            '<div class="search-result-title">' + data.title + "</div>" +
+            '<div class="search-result-excerpt">' + data.excerpt + "</div>" +
+            catBadge +
+            "</a>";
+        }));
+        results.innerHTML = '<div class="search-result-list">' + items.join("") + "</div>";
+        var first = results.querySelector("a");
+        if (first) first.setAttribute("data-first", "true");
+      } catch (err) {
+        results.innerHTML = '<div class="search-overlay-empty">// search error — try again</div>';
+      }
+    }
+  })();
+</script>

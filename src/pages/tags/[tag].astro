@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  function slugify(s) { return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""); }
+  const allPosts = await getCollection("blog");
+  const tagMap = new Map<string, string>();
+  allPosts.forEach((p) => p.data.tags.forEach((t) => {
+    const slug = slugify(t);
+    if (!tagMap.has(slug)) tagMap.set(slug, t);
+  }));
+  return Array.from(tagMap).map(([slug, original]) => ({ params: { tag: slug }, props: { tag: slug, original } }));
+}
+
+const { tag, original } = Astro.props as { tag: string; original: string };
+
+function slugify(s: string) { return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""); }
+const allPosts = await getCollection("blog");
+const filteredPosts = allPosts
+  .filter((p) => p.data.tags.some((t) => slugify(t) === tag))
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+---
+
+<BaseLayout title={`#${tag} — MarketMax`} description={`Articles tagged with #${tag}.`}>
+  <Header />
+  <main class="animate-fade-in-up">
+    <div class="container-blog pt-16 sm:pt-20">
+      <Breadcrumb items={[
+        { href: "/blog", label: "blog" },
+        { label: `#${tag}` },
+      ]} />
+    </div>
+    <div class="border-b border-border-default">
+      <div class="container-blog pb-16 sm:pb-20">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider border border-accent-primary/25 text-accent-primary bg-accent-subtle">
+            <span class="w-1 h-1 rounded-full bg-current"></span>
+            #{original}
+          </span>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">#{original}</h1>
+        <p class="text-sm font-mono text-text-secondary">
+          Articles tagged with <span class="text-accent-primary">#{original}</span>
+          <span class="text-text-muted"> ({filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""})</span>
+        </p>
+      </div>
+    </div>
+    <div class="container-blog pb-16 pt-10 sm:pb-20 sm:pt-12">
+    {filteredPosts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredPosts.map((post) => <BlogCard post={post} />)}
+      </div>
+    ) : (
+      <div class="text-center py-20">
+        <p class="text-sm font-mono text-text-muted">No articles with this tag yet.</p>
+      </div>
+    )}
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>

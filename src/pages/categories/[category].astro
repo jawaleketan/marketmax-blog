@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import BlogCard from "../../components/BlogCard.astro";
+import Breadcrumb from "../../components/Breadcrumb.astro";
 import { getCollection } from "astro:content";
 
 type Cat = "seo" | "social-media" | "content-marketing" | "ppc" | "analytics";
@@ -49,8 +50,14 @@ const icons: Record<Cat, string> = {
 <BaseLayout title={`${labels[category]} — MarketMax`} description={descs[category]}>
   <Header />
   <main class="animate-fade-in-up">
+    <div class="container-blog pt-16 sm:pt-20">
+      <Breadcrumb items={[
+        { href: "/blog", label: "blog" },
+        { label: labels[category] },
+      ]} />
+    </div>
     <div class={`category-banner-${category} border-b border-border-default`}>
-      <div class="container-blog py-16 sm:py-20">
+      <div class="container-blog pb-16 sm:pb-20">
         <div class="flex items-center gap-4 mb-4">
           <span class={`flex items-center justify-center w-12 h-12 rounded-lg border ${colors[category]}`} set:html={icons[category]} />
           <div>

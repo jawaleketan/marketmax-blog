@@ -42,4 +42,5 @@ collections:
       - { label: "Tags", name: "tags", widget: "list", default: ["marketing"], hint: "Press Enter to add tags" }
       - { label: "Reading Time", name: "readingTime", widget: "string", required: false, hint: "e.g. 5 min read" }
       - { label: "Featured", name: "featured", widget: "boolean", default: false, hint: "Show in featured section on homepage" }
+      - { label: "Series", name: "series", widget: "string", required: false, hint: "Group related posts (e.g. 'SEO Basics'). Posts in same series are linked." }
       - { label: "Body", name: "body", widget: "markdown", editor_components: [], modes: ["rich_text", "raw"] }

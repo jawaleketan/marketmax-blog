@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import SearchOverlay from "../components/SearchOverlay.astro";
+import ClientRouter from "astro/components/ClientRouter.astro";
 
 export interface Props {
   title: string;
@@ -29,6 +31,9 @@ const { title, description, image } = Astro.props;
     <meta name="twitter:description" content={description} />
 
     <title>{title} | MarketMax</title>
+    <link rel="preconnect" href="https://buttondown.com" />
+    <link rel="preconnect" href="https://pagefind.app" />
+    <ClientRouter fallback="animate" />
 
     <script>
       (function() {
@@ -83,7 +88,7 @@ const { title, description, image } = Astro.props;
   <body class="bg-bg-base text-text-primary antialiased">
     <div id="progress-bar"></div>
     <slot />
-
+    <SearchOverlay />
     <button id="scroll-top-btn" aria-label="Scroll to top">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
     </button>
@@ -96,7 +101,8 @@ const { title, description, image } = Astro.props;
           function updateBar() {
             const scrollTop = window.scrollY;
             const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            if (docHeight <= 0) { bar.style.width = "0%"; return; }
+            if (docHeight <= 0) { bar.style.width = "0%"; bar.style.opacity = "0"; return; }
+            bar.style.opacity = "1";
             bar.style.width = Math.min((scrollTop / docHeight) * 100, 100) + "%";
             ticking = false;
           }
@@ -127,6 +133,44 @@ const { title, description, image } = Astro.props;
           html.setAttribute("data-theme", next);
           localStorage.setItem("theme", next);
         };
+
+        const pres = document.querySelectorAll(".prose pre");
+        pres.forEach(function(pre) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "code-block-wrapper";
+          pre.parentNode.insertBefore(wrapper, pre);
+          wrapper.appendChild(pre);
+
+          const code = pre.querySelector("code");
+          const lang = code ? Array.from(code.classList).find(function(c) { return c.startsWith("language-"); }) : null;
+          if (lang) {
+            const label = document.createElement("span");
+            label.className = "code-lang-label";
+            label.textContent = lang.replace("language-", "");
+            wrapper.appendChild(label);
+          }
+
+          const btn = document.createElement("button");
+          btn.className = "code-copy-btn";
+          btn.setAttribute("aria-label", "Copy code");
+          btn.innerHTML = '<svg class="code-copy-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+          btn.innerHTML += '<span class="code-copy-label">Copy</span>';
+          wrapper.appendChild(btn);
+
+          btn.addEventListener("click", function() {
+            const c = pre.querySelector("code");
+            const text = c ? c.textContent || "" : pre.textContent || "";
+            navigator.clipboard.writeText(text).then(function() {
+              btn.classList.add("copied");
+              const label = btn.querySelector(".code-copy-label");
+              if (label) label.textContent = "Copied!";
+              setTimeout(function() {
+                btn.classList.remove("copied");
+                if (label) label.textContent = "Copy";
+              }, 2000);
+            });
+          });
+        });
       })();
     </script>
   </body>
