@@ -47,6 +47,49 @@ const { title, description, image } = Astro.props;
     `} />
   </head>
   <body class="bg-bg-base text-text-primary antialiased">
+    <!-- Reading Progress Bar -->
+    <div id="progress-bar"></div>
     <slot />
+
+    <!-- Scroll-to-top Button -->
+    <button id="scroll-top-btn" aria-label="Scroll to top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    </button>
+
+    <script>
+      (function() {
+        // Reading progress bar
+        const bar = document.getElementById("progress-bar");
+        if (bar) {
+          let ticking = false;
+          function updateBar() {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (docHeight <= 0) { bar.style.width = "0%"; return; }
+            bar.style.width = Math.min((scrollTop / docHeight) * 100, 100) + "%";
+            ticking = false;
+          }
+          window.addEventListener("scroll", () => {
+            if (!ticking) { requestAnimationFrame(updateBar); ticking = true; }
+          });
+          updateBar();
+        }
+
+        // Scroll-to-top button
+        const btn = document.getElementById("scroll-top-btn");
+        if (btn) {
+          let ticking2 = false;
+          function updateBtn() {
+            if (window.scrollY > 400) btn.classList.add("visible"); else btn.classList.remove("visible");
+            ticking2 = false;
+          }
+          window.addEventListener("scroll", () => {
+            if (!ticking2) { requestAnimationFrame(updateBtn); ticking2 = true; }
+          });
+          btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+          updateBtn();
+        }
+      })();
+    </script>
   </body>
 </html>
