@@ -2,7 +2,6 @@ backend:
   name: github
   repo: jawaleketan/marketmax-blog
   branch: main
-  site_domain: marketmax-blog.netlify.app
   auth_type: pkce
 
 media_folder: "public/images"
