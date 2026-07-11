@@ -31,18 +31,45 @@ const { title, description, image } = Astro.props;
 
     <title>{title} | MarketMax</title>
 
-    <!-- JSON-LD -->
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json" set:html={`
       {
         "@context": "https://schema.org",
-        "@type": "Blog",
-        "name": "MarketMax",
-        "description": "${description}",
-        "url": "https://marketmax-blog.netlify.app",
-        "author": {
-          "@type": "Person",
-          "name": "Ketan Jawale"
-        }
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://marketmax-blog.netlify.app/#website",
+            "url": "https://marketmax-blog.netlify.app",
+            "name": "MarketMax — Free Digital Marketing Insights",
+            "description": "${description}",
+            "inLanguage": "en-US",
+            "publisher": {
+              "@type": "Person",
+              "@id": "https://marketmax-blog.netlify.app/#person",
+              "name": "Ketan Jawale"
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://marketmax-blog.netlify.app/#person",
+            "name": "Ketan Jawale",
+            "description": "Digital Marketing Enthusiast sharing free insights on SEO, Social Media, Content Marketing, PPC, and Analytics.",
+            "url": "https://marketmax-blog.netlify.app/about"
+          },
+          {
+            "@type": "Blog",
+            "@id": "https://marketmax-blog.netlify.app/#blog",
+            "url": "https://marketmax-blog.netlify.app",
+            "name": "MarketMax Blog",
+            "description": "${description}",
+            "isPartOf": {
+              "@id": "https://marketmax-blog.netlify.app/#website"
+            },
+            "author": {
+              "@id": "https://marketmax-blog.netlify.app/#person"
+            }
+          }
+        ]
       }
     `} />
   </head>
