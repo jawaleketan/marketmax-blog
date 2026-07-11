@@ -42,7 +42,7 @@ const colors: Record<Cat, string> = {
   <Header />
   <main class="animate-fade-in-up">
     <div class={`category-banner-${category} border-b border-border-default`}>
-      <div class="container-blog py-16">
+      <div class="container-blog py-20">
         <span class={`inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider border mb-4 ${colors[category]}`}>
           {labels[category]}
         </span>
@@ -50,9 +50,9 @@ const colors: Record<Cat, string> = {
         <p class="text-text-secondary max-w-2xl">{descs[category]}</p>
       </div>
     </div>
-    <div class="container-blog py-10">
+    <div class="container-blog py-12">
     {filteredPosts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredPosts.map((post) => <BlogCard post={post} />)}
       </div>
     ) : (

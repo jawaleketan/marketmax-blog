@@ -12,12 +12,12 @@ const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.dat
 
 <BaseLayout title="All Articles — MarketMax" description="Browse all free digital marketing articles by Ketan Jawale.">
   <Header />
-  <main class="container-blog py-16 animate-fade-in-up">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-2">All Articles</h1>
-    <p class="text-text-secondary mb-8">Free digital marketing insights — from SEO to analytics.</p>
-    <div class="mb-10"><Search /></div>
+  <main class="container-blog py-20 animate-fade-in-up">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-3">All Articles</h1>
+    <p class="text-text-secondary mb-10">Free digital marketing insights — from SEO to analytics.</p>
+    <div class="mb-12"><Search /></div>
     {sortedPosts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {sortedPosts.map((post) => <BlogCard post={post} />)}
       </div>
     ) : (

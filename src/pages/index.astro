@@ -19,21 +19,21 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     <Hero />
 
     {featuredPost && (
-      <section class="container-blog mb-12 animate-fade-in-up" style="animation-delay: 0.1s">
+      <section class="container-blog mb-16 animate-fade-in-up" style="animation-delay: 0.1s">
         <h2 class="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4">Featured Article</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />
         </div>
       </section>
     )}
 
-    <section class="container-blog mb-16 animate-fade-in-up" style="animation-delay: 0.2s">
-      <div class="flex items-center justify-between mb-6">
+    <section class="container-blog mb-20 animate-fade-in-up" style="animation-delay: 0.2s">
+      <div class="flex items-center justify-between mb-8">
         <h2 class="text-xs font-semibold uppercase tracking-widest text-text-muted">Latest Articles</h2>
         <a href="/blog" class="text-sm text-accent-primary hover:text-accent-hover transition-colors">View All →</a>
       </div>
       {recentPosts.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {recentPosts.map((post, i) => (
             <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
               <BlogCard post={post} />
@@ -45,7 +45,7 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       )}
     </section>
 
-    <section class="container-blog pb-16 animate-fade-in-up" style="animation-delay: 0.3s">
+    <section class="container-blog pb-20 animate-fade-in-up" style="animation-delay: 0.3s">
       <Newsletter />
     </section>
   </main>

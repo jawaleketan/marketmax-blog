@@ -187,8 +187,8 @@ body {
 .delay-6 { animation-delay: 0.3s; }
 
 /* ─── Utilities ─── */
-.container-blog { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-.container-article { max-width: 720px; margin: 0 auto; padding: 0 1.5rem; }
+.container-blog { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.container-article { max-width: 720px; margin: 0 auto; padding: 0 2rem; }
 
 /* ─── Animations ─── */
 @keyframes fade-in-up {
