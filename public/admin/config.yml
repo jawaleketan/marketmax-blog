@@ -4,6 +4,10 @@ backend:
 
 media_folder: "public/images"
 public_folder: "/images"
+public_path: "/images"
+
+editor:
+  preview: false
 
 collections:
   - name: "blog"
@@ -16,13 +20,26 @@ collections:
     extension: md
     format: frontmatter
     preview_path: "blog/{{slug}}"
+    summary: "{{title}} — {{category}} ({{publishDate | date('MMM D, YYYY')}})"
+    sortable_fields: ["publishDate", "title"]
+    view_filters:
+      - { label: "SEO", field: "category", pattern: "seo" }
+      - { label: "Social Media", field: "category", pattern: "social-media" }
+      - { label: "Content Marketing", field: "category", pattern: "content-marketing" }
+      - { label: "PPC", field: "category", pattern: "ppc" }
+      - { label: "Analytics", field: "category", pattern: "analytics" }
+      - { label: "Featured", field: "featured", pattern: true }
+      - { label: "Drafts", field: "draft", pattern: true }
+    view_groups:
+      - { label: "Category", field: "category" }
     fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Description", name: "description", widget: "text" }
-      - { label: "Publish Date", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD", timeFormat: false }
+      - { label: "Title", name: "title", widget: "string", pattern: [".{10,}", "Must be at least 10 characters"] }
+      - { label: "Description", name: "description", widget: "text", pattern: [".{50,}", "Must be at least 50 characters"] }
+      - { label: "Publish Date", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD", timeFormat: false, default: "{{now}}" }
       - { label: "Author", name: "author", widget: "string", default: "Ketan Jawale" }
-      - { label: "Featured Image", name: "image", widget: "image", required: false }
+      - { label: "Featured Image", name: "image", widget: "image", required: false, hint: "Recommended: 1200x630px for social sharing" }
       - { label: "Category", name: "category", widget: "select", options: [{ label: "SEO", value: "seo" }, { label: "Social Media", value: "social-media" }, { label: "Content Marketing", value: "content-marketing" }, { label: "PPC", value: "ppc" }, { label: "Analytics", value: "analytics" }] }
-      - { label: "Tags", name: "tags", widget: "list", default: ["marketing"] }
-      - { label: "Featured", name: "featured", widget: "boolean", default: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Tags", name: "tags", widget: "list", default: ["marketing"], hint: "Press Enter to add tags" }
+      - { label: "Reading Time", name: "readingTime", widget: "string", required: false, hint: "e.g. 5 min read" }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false, hint: "Show in featured section on homepage" }
+      - { label: "Body", name: "body", widget: "markdown", editor_components: [], modes: ["rich_text", "raw"] }
