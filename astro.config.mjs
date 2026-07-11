@@ -6,7 +6,7 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://marketmax-blog.pages.dev",
+  site: "https://marketmax-blog.netlify.app",
   integrations: [mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],

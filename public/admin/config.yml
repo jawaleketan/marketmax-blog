@@ -2,7 +2,7 @@ backend:
   name: github
   repo: jawaleketan/marketmax-blog
   branch: main
-  site_domain: marketmax-blog.pages.dev
+  site_domain: marketmax-blog.netlify.app
 
 media_folder: "public/images"
 public_folder: "/images"
