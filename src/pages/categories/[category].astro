@@ -30,11 +30,19 @@ const descs: Record<Cat, string> = {
   analytics: "Analytics, data-driven decisions, CRO, reporting tools.",
 };
 const colors: Record<Cat, string> = {
-  seo: "bg-tag-seo/10 text-tag-seo border-tag-seo/30",
-  "social-media": "bg-tag-social/10 text-tag-social border-tag-social/30",
-  "content-marketing": "bg-tag-content/10 text-tag-content border-tag-content/30",
-  ppc: "bg-tag-ppc/10 text-tag-ppc border-tag-ppc/30",
-  analytics: "bg-tag-analytics/10 text-tag-analytics border-tag-analytics/30",
+  seo: "bg-tag-seo/5 text-tag-seo border-tag-seo/25",
+  "social-media": "bg-tag-social/5 text-tag-social border-tag-social/25",
+  "content-marketing": "bg-tag-content/5 text-tag-content border-tag-content/25",
+  ppc: "bg-tag-ppc/5 text-tag-ppc border-tag-ppc/25",
+  analytics: "bg-tag-analytics/5 text-tag-analytics border-tag-analytics/25",
+};
+
+const icons: Record<Cat, string> = {
+  seo: `<svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="M11 8v3l2 1"/></svg>`,
+  "social-media": `<svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H4z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  "content-marketing": `<svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+  ppc: `<svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  analytics: `<svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
 };
 ---
 
@@ -42,23 +50,29 @@ const colors: Record<Cat, string> = {
   <Header />
   <main class="animate-fade-in-up">
     <div class={`category-banner-${category} border-b border-border-default`}>
-      <div class="container-blog py-20">
-        <span class={`inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider border mb-4 ${colors[category]}`}>
-          {labels[category]}
-        </span>
-        <h1 class="text-3xl sm:text-4xl font-bold mb-2">{labels[category]} Articles</h1>
-        <p class="text-text-secondary max-w-2xl">{descs[category]}</p>
+      <div class="container-blog py-16 sm:py-20">
+        <div class="flex items-center gap-4 mb-4">
+          <span class={`flex items-center justify-center w-12 h-12 rounded-lg border ${colors[category]}`} set:html={icons[category]} />
+          <div>
+            <span class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${colors[category]}`}>
+              <span class="w-1 h-1 rounded-full bg-current"></span>
+              {labels[category]}
+            </span>
+          </div>
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">{labels[category]} Articles</h1>
+        <p class="text-sm font-mono text-text-secondary max-w-2xl">{descs[category]} <span class="text-text-muted">({filteredPosts.length} posts)</span></p>
       </div>
     </div>
-    <div class="container-blog py-12">
+    <div class="container-blog pb-16 pt-10 sm:pb-20 sm:pt-12">
     {filteredPosts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredPosts.map((post) => <BlogCard post={post} />)}
       </div>
     ) : (
       <div class="text-center py-20">
-        <p class="text-lg text-text-muted">No articles in this category yet.</p>
-        <p class="text-sm text-text-muted mt-2">Check back soon!</p>
+        <p class="text-sm font-mono text-text-muted">No articles in this category yet.</p>
+        <p class="text-xs font-mono text-text-muted mt-2">Check back soon!</p>
       </div>
     )}
     </div>

@@ -11,7 +11,7 @@ const { title, description, image } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -19,7 +19,6 @@ const { title, description, image } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
 
-    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -31,7 +30,15 @@ const { title, description, image } = Astro.props;
 
     <title>{title} | MarketMax</title>
 
-    <!-- JSON-LD Structured Data -->
+    <script>
+      (function() {
+        const saved = localStorage.getItem("theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const theme = saved || (prefersLight ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+
     <script type="application/ld+json" set:html={`
       {
         "@context": "https://schema.org",
@@ -74,18 +81,15 @@ const { title, description, image } = Astro.props;
     `} />
   </head>
   <body class="bg-bg-base text-text-primary antialiased">
-    <!-- Reading Progress Bar -->
     <div id="progress-bar"></div>
     <slot />
 
-    <!-- Scroll-to-top Button -->
     <button id="scroll-top-btn" aria-label="Scroll to top">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
     </button>
 
     <script>
       (function() {
-        // Reading progress bar
         const bar = document.getElementById("progress-bar");
         if (bar) {
           let ticking = false;
@@ -102,7 +106,6 @@ const { title, description, image } = Astro.props;
           updateBar();
         }
 
-        // Scroll-to-top button
         const btn = document.getElementById("scroll-top-btn");
         if (btn) {
           let ticking2 = false;
@@ -116,6 +119,14 @@ const { title, description, image } = Astro.props;
           btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
           updateBtn();
         }
+
+        window.__themeToggle = function() {
+          const html = document.documentElement;
+          const current = html.getAttribute("data-theme");
+          const next = current === "dark" ? "light" : "dark";
+          html.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+        };
       })();
     </script>
   </body>

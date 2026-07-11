@@ -12,16 +12,22 @@ const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.dat
 
 <BaseLayout title="All Articles — MarketMax" description="Browse all free digital marketing articles by Ketan Jawale.">
   <Header />
-  <main class="container-blog py-20 animate-fade-in-up">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-3">All Articles</h1>
-    <p class="text-text-secondary mb-10">Free digital marketing insights — from SEO to analytics.</p>
+  <main class="container-blog py-16 sm:py-20 animate-fade-in-up">
+    <div class="flex items-center gap-2 mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
+      <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Articles</h2>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">All Articles</h1>
+    <p class="text-sm font-mono text-text-secondary mb-8">Free digital marketing insights — from SEO to analytics. <span class="text-text-muted">({sortedPosts.length} posts)</span></p>
     <div class="mb-12"><Search /></div>
     {sortedPosts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {sortedPosts.map((post) => <BlogCard post={post} />)}
       </div>
     ) : (
-      <div class="text-center py-20"><p class="text-lg text-text-muted">No articles published yet.</p></div>
+      <div class="text-center py-20">
+        <p class="text-sm font-mono text-text-muted">No articles published yet.</p>
+      </div>
     )}
   </main>
   <Footer />
