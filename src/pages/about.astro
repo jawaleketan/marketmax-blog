@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Newsletter from "../components/Newsletter.astro";
+---
+
+<BaseLayout title="About Ketan Jawale — MarketMax" description="Learn more about Ketan Jawale, the founder of MarketMax — a free digital marketing blog.">
+  <Header />
+  <main class="container-article py-16 animate-fade-in-up">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-6">About Ketan Jawale</h1>
+    <div class="flex items-center gap-6 mb-10 p-6 rounded-xl bg-bg-card border border-border-default">
+      <div class="w-20 h-20 rounded-full bg-bg-hover flex items-center justify-center text-accent-primary font-bold text-3xl shrink-0">KJ</div>
+      <div><p class="font-semibold text-lg text-text-primary">Ketan Jawale</p><p class="text-sm text-text-muted">Digital Marketing Enthusiast & Educator</p></div>
+    </div>
+    <div class="prose">
+      <p>Welcome to <strong>MarketMax</strong> — your free resource for practical digital marketing knowledge. I'm Ketan Jawale, and I created this blog to share what I've learned about marketing in the digital age.</p>
+      <h2>Why MarketMax?</h2>
+      <p>The internet is full of overpriced courses and jargon-filled guides. MarketMax is my attempt to cut through the noise and deliver actionable, easy-to-understand marketing insights — completely free.</p>
+      <h2>What I Cover</h2>
+      <ul><li><strong>SEO</strong> — Technical SEO, keyword research, link building</li><li><strong>Social Media</strong> — Platform strategies, content creation</li><li><strong>Content Marketing</strong> — Copywriting, storytelling, distribution</li><li><strong>PPC</strong> — Google Ads, budget optimization</li><li><strong>Analytics</strong> — Data-driven decisions, reporting</li></ul>
+      <h2>My Philosophy</h2>
+      <p>Marketing should be accessible to everyone. Whether you're a small business owner, a freelancer, or someone just starting — you shouldn't have to pay a fortune to learn what works.</p>
+    </div>
+    <div class="mt-12"><Newsletter /></div>
+  </main>
+  <Footer />
+</BaseLayout>

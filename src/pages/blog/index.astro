@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import Search from "../../components/Search.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("blog");
+const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+---
+
+<BaseLayout title="All Articles — MarketMax" description="Browse all free digital marketing articles by Ketan Jawale.">
+  <Header />
+  <main class="container-blog py-16 animate-fade-in-up">
+    <h1 class="text-3xl sm:text-4xl font-bold mb-2">All Articles</h1>
+    <p class="text-text-secondary mb-8">Free digital marketing insights — from SEO to analytics.</p>
+    <div class="mb-10"><Search /></div>
+    {sortedPosts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedPosts.map((post) => <BlogCard post={post} />)}
+      </div>
+    ) : (
+      <div class="text-center py-20"><p class="text-lg text-text-muted">No articles published yet.</p></div>
+    )}
+  </main>
+  <Footer />
+</BaseLayout>

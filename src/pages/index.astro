@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Hero from "../components/Hero.astro";
+import BlogCard from "../components/BlogCard.astro";
+import Newsletter from "../components/Newsletter.astro";
+import { getCollection } from "astro:content";
+
+const allPosts = await getCollection("blog");
+const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+const featuredPost = sortedPosts.find((p) => p.data.featured) || sortedPosts[0];
+const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
+---
+
+<BaseLayout title="MarketMax — Free Digital Marketing Insights" description="Free digital marketing blog by Ketan Jawale. Learn SEO, social media, content marketing, PPC, and analytics with actionable guides.">
+  <Header />
+  <main>
+    <Hero />
+
+    {featuredPost && (
+      <section class="container-blog mb-12 animate-fade-in-up" style="animation-delay: 0.1s">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-text-muted mb-4">Featured Article</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <BlogCard post={featuredPost} featured={true} />
+        </div>
+      </section>
+    )}
+
+    <section class="container-blog mb-16 animate-fade-in-up" style="animation-delay: 0.2s">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xs font-semibold uppercase tracking-widest text-text-muted">Latest Articles</h2>
+        <a href="/blog" class="text-sm text-accent-primary hover:text-accent-hover transition-colors">View All →</a>
+      </div>
+      {recentPosts.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {recentPosts.map((post) => <BlogCard post={post} />)}
+        </div>
+      ) : (
+        <div class="col-span-full text-center py-12 text-text-muted"><p class="text-lg">No articles yet. Check back soon!</p></div>
+      )}
+    </section>
+
+    <section class="container-blog pb-16 animate-fade-in-up" style="animation-delay: 0.3s">
+      <Newsletter />
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

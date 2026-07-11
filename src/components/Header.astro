@@ -1,0 +1,49 @@
+---
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "Blog", href: "/blog" },
+  { label: "SEO", href: "/categories/seo" },
+  { label: "Social", href: "/categories/social-media" },
+  { label: "Content", href: "/categories/content-marketing" },
+  { label: "PPC", href: "/categories/ppc" },
+  { label: "Analytics", href: "/categories/analytics" },
+  { label: "About", href: "/about" },
+];
+---
+
+<header class="sticky top-0 z-50 bg-bg-base/80 backdrop-blur-md border-b border-border-default">
+  <div class="container-blog flex items-center justify-between h-16">
+    <a href="/" class="text-xl font-bold text-text-primary hover:text-accent-primary transition-colors duration-150">
+      <span class="text-accent-primary">M</span>arketMax
+    </a>
+
+    <nav class="hidden md:flex items-center gap-6">
+      {navLinks.map((link) => (
+        <a href={link.href} class="text-sm text-text-secondary hover:text-text-primary transition-colors duration-150">{link.label}</a>
+      ))}
+    </nav>
+
+    <button id="menu-toggle" class="md:hidden text-text-secondary hover:text-text-primary transition-colors" aria-label="Toggle menu">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="hidden md:hidden border-t border-border-default bg-bg-surface">
+    <div class="container-blog py-4 flex flex-col gap-3">
+      {navLinks.map((link) => (
+        <a href={link.href} class="text-sm text-text-secondary hover:text-text-primary transition-colors">{link.label}</a>
+      ))}
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById("menu-toggle");
+  const menu = document.getElementById("mobile-menu");
+  if (toggle && menu) {
+    toggle.addEventListener("click", () => menu.classList.toggle("hidden"));
+    menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => menu.classList.add("hidden")));
+  }
+</script>

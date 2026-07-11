@@ -1,0 +1,30 @@
+backend:
+  name: github
+  repo: jawaleketan/marketmax-blog
+  branch: main
+  site_domain: marketmax-blog.pages.dev
+
+media_folder: "public/images"
+public_folder: "/images"
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    label_singular: "Post"
+    folder: "src/content/blog"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: md
+    format: frontmatter
+    preview_path: "blog/{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Publish Date", name: "publishDate", widget: "datetime", format: "YYYY-MM-DD", timeFormat: false }
+      - { label: "Author", name: "author", widget: "string", default: "Ketan Jawale" }
+      - { label: "Featured Image", name: "image", widget: "image", required: false }
+      - { label: "Category", name: "category", widget: "select", options: [{ label: "SEO", value: "seo" }, { label: "Social Media", value: "social-media" }, { label: "Content Marketing", value: "content-marketing" }, { label: "PPC", value: "ppc" }, { label: "Analytics", value: "analytics" }] }
+      - { label: "Tags", name: "tags", widget: "list", default: ["marketing"] }
+      - { label: "Featured", name: "featured", widget: "boolean", default: false }
+      - { label: "Body", name: "body", widget: "markdown" }

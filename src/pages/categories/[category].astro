@@ -1,0 +1,63 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import BlogCard from "../../components/BlogCard.astro";
+import { getCollection } from "astro:content";
+
+type Cat = "seo" | "social-media" | "content-marketing" | "ppc" | "analytics";
+
+export async function getStaticPaths() {
+  const cats: Cat[] = ["seo", "social-media", "content-marketing", "ppc", "analytics"];
+  return cats.map((category) => ({ params: { category }, props: { category } }));
+}
+
+const { category } = Astro.props as { category: Cat };
+
+const allPosts = await getCollection("blog");
+const filteredPosts = allPosts
+  .filter((p) => p.data.category === category)
+  .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
+
+const labels: Record<Cat, string> = {
+  seo: "SEO", "social-media": "Social Media", "content-marketing": "Content Marketing", ppc: "PPC", analytics: "Analytics",
+};
+const descs: Record<Cat, string> = {
+  seo: "SEO strategies, technical tips, link building, and keyword research.",
+  "social-media": "Social media tactics, platform updates, engagement strategies.",
+  "content-marketing": "Content strategy, copywriting, storytelling, distribution.",
+  ppc: "PPC guides, Google Ads, budget optimization, ad creative.",
+  analytics: "Analytics, data-driven decisions, CRO, reporting tools.",
+};
+const colors: Record<Cat, string> = {
+  seo: "bg-tag-seo/10 text-tag-seo border-tag-seo/30",
+  "social-media": "bg-tag-social/10 text-tag-social border-tag-social/30",
+  "content-marketing": "bg-tag-content/10 text-tag-content border-tag-content/30",
+  ppc: "bg-tag-ppc/10 text-tag-ppc border-tag-ppc/30",
+  analytics: "bg-tag-analytics/10 text-tag-analytics border-tag-analytics/30",
+};
+---
+
+<BaseLayout title={`${labels[category]} — MarketMax`} description={descs[category]}>
+  <Header />
+  <main class="container-blog py-16 animate-fade-in-up">
+    <div class="mb-10">
+      <span class={`inline-block px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider border mb-4 ${colors[category]}`}>
+        {labels[category]}
+      </span>
+      <h1 class="text-3xl sm:text-4xl font-bold mb-2">{labels[category]} Articles</h1>
+      <p class="text-text-secondary max-w-2xl">{descs[category]}</p>
+    </div>
+    {filteredPosts.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredPosts.map((post) => <BlogCard post={post} />)}
+      </div>
+    ) : (
+      <div class="text-center py-20">
+        <p class="text-lg text-text-muted">No articles in this category yet.</p>
+        <p class="text-sm text-text-muted mt-2">Check back soon!</p>
+      </div>
+    )}
+  </main>
+  <Footer />
+</BaseLayout>
