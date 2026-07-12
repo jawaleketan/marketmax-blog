@@ -53,6 +53,12 @@ Technical SEO ensures search engines can find and understand your content. Focus
 
 Backlinks remain one of Google's top ranking signals. Create linkable assets, guest post on reputable sites, and find broken link opportunities.
 
+## Step 5: AI Search Optimization
+
+Search is evolving beyond Google. AI engines like ChatGPT and Perplexity now cite web content in their responses. Learn more:
+- [What is Generative Engine Optimization (GEO)?](/blog/generative-engine-optimization)
+- [How to Optimize for AI Overviews](/blog/optimize-for-ai-overviews)
+
 ## The Bottom Line
 
 SEO isn't about tricking Google. It's about creating the best possible experience for your users while making it easy for search engines to understand your content.

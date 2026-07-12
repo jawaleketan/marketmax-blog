@@ -17,6 +17,11 @@ Here are the 7 SEO trends you need to know — and exactly how to prepare for ea
 
 Google's AI Overviews (formerly SGE) now appear on over 40% of search queries. These AI-generated summaries sit at the top of search results, pulling information from multiple sources.
 
+Want to dive deeper? Read our complete guides:
+- [What is Generative Engine Optimization (GEO)?](/blog/generative-engine-optimization)
+- [How to Optimize for AI Overviews](/blog/optimize-for-ai-overviews)
+- [RAG Explained: How AI Search Works](/blog/rag-explained-seo)
+
 ### How to Prepare
 
 - **Write for extraction.** Structure your content so Google can easily pull concise, factual answers. Use clear headings, bullet points, and short paragraphs.
