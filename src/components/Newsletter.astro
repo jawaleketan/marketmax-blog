@@ -24,14 +24,14 @@
 </div>
 
 <script>
-  (function() {
+  document.addEventListener('astro:page-load', () => {
     var form = document.getElementById("newsletter-form");
     var email = document.getElementById("newsletter-email");
     var submit = document.getElementById("newsletter-submit");
     var msg = document.getElementById("newsletter-msg");
     if (!form || !email || !submit || !msg) return;
 
-    form.addEventListener("submit", function(e) {
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
 
       // Check honeypot
@@ -49,10 +49,10 @@
       fetch("/api/subscribers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: val }),
+        body: JSON.stringify({ email: val })
       })
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
+        .then(r => r.json())
+        .then(data => {
           if (data.success) {
             msg.textContent = data.message || "Subscribed! Welcome aboard.";
             msg.style.color = "var(--color-tag-seo)";
@@ -64,12 +64,12 @@
           submit.disabled = false;
           submit.textContent = "subscribe →";
         })
-        .catch(function() {
+        .catch(() => {
           msg.textContent = "Network error. Try again.";
           msg.style.color = "var(--color-tag-analytics)";
           submit.disabled = false;
           submit.textContent = "subscribe →";
         });
     });
-  })();
+  });
 </script>
