@@ -21,7 +21,15 @@ export default async (request) => {
   }
 
   const url = new URL(request.url);
-  const slug = url.searchParams.get("slug");
+  let slug = url.searchParams.get("slug");
+
+  // For POST, read slug from body
+  if (!slug && request.method === "POST") {
+    try {
+      const body = await request.json();
+      slug = body?.slug;
+    } catch {}
+  }
 
   if (!slug) {
     if (request.method === "GET") {
