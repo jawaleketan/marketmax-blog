@@ -1,12 +1,25 @@
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
+
+function supabaseRest(path, options = {}) {
+  const url = `${supabaseUrl}/rest/v1/${path}`;
+  return fetch(url, {
+    ...options,
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      Prefer: options.prefer || "return=representation",
+      ...options.headers,
+    },
+  });
+}
 
 export default async (request) => {
   if (request.method === "OPTIONS") {
@@ -19,7 +32,6 @@ export default async (request) => {
 
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.slice(7);
-    // Decode JWT to get user ID (Netlify Identity tokens are JWTs)
     try {
       const payload = JSON.parse(atob(token.split(".")[1]));
       userId = payload.sub || payload.email;
@@ -38,14 +50,13 @@ export default async (request) => {
   const url = new URL(request.url);
 
   if (request.method === "GET") {
-    const { data, error } = await supabase
-      .from("bookmarks")
-      .select("slug, created_at")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: false });
+    const res = await supabaseRest(
+      `bookmarks?user_id=eq.${encodeURIComponent(userId)}&select=slug,created_at&order=created_at.desc`
+    );
+    const data = await res.json();
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
@@ -76,26 +87,17 @@ export default async (request) => {
     }
 
     // Check if already bookmarked
-    const { data: existing } = await supabase
-      .from("bookmarks")
-      .select("id")
-      .eq("user_id", userId)
-      .eq("slug", slug)
-      .single();
+    const existingRes = await supabaseRest(
+      `bookmarks?user_id=eq.${encodeURIComponent(userId)}&slug=eq.${encodeURIComponent(slug)}&select=id`
+    );
+    const existing = await existingRes.json();
 
-    if (existing) {
+    if (existing && existing.length > 0) {
       // Remove bookmark (toggle)
-      const { error } = await supabase
-        .from("bookmarks")
-        .delete()
-        .eq("id", existing.id);
-
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
+      await supabaseRest(`bookmarks?id=eq.${existing[0].id}`, {
+        method: "DELETE",
+        prefer: "return=minimal",
+      });
 
       return new Response(JSON.stringify({ bookmarked: false, slug }), {
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -103,13 +105,15 @@ export default async (request) => {
     }
 
     // Add bookmark
-    const { error } = await supabase.from("bookmarks").insert({
-      user_id: userId,
-      slug,
+    const res = await supabaseRest("bookmarks", {
+      method: "POST",
+      body: JSON.stringify({ user_id: userId, slug }),
     });
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    const data = await res.json();
+
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
@@ -130,14 +134,14 @@ export default async (request) => {
       });
     }
 
-    const { error } = await supabase
-      .from("bookmarks")
-      .delete()
-      .eq("user_id", userId)
-      .eq("slug", slug);
+    const res = await supabaseRest(
+      `bookmarks?user_id=eq.${encodeURIComponent(userId)}&slug=eq.${encodeURIComponent(slug)}`,
+      { method: "DELETE", prefer: "return=minimal" }
+    );
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    if (!res.ok) {
+      const data = await res.json();
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });

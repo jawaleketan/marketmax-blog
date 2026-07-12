@@ -1,12 +1,25 @@
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+function supabaseRest(path, options = {}) {
+  const url = `${supabaseUrl}/rest/v1/${path}`;
+  return fetch(url, {
+    ...options,
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      Prefer: options.prefer || "return=representation",
+      ...options.headers,
+    },
+  });
+}
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -18,19 +31,17 @@ export default async (request) => {
   }
 
   if (request.method === "GET") {
-    const { count, error } = await supabase
-      .from("subscribers")
-      .select("*", { count: "exact", head: true })
-      .eq("confirmed", true);
+    const res = await supabaseRest("subscribers?confirmed=eq.true&select=id");
+    const data = await res.json();
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
     }
 
-    return new Response(JSON.stringify({ count: count || 0 }), {
+    return new Response(JSON.stringify({ count: data?.length || 0 }), {
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
@@ -56,29 +67,27 @@ export default async (request) => {
     }
 
     // Check if already subscribed
-    const { data: existing } = await supabase
-      .from("subscribers")
-      .select("id, confirmed")
-      .eq("email", email.toLowerCase())
-      .single();
+    const existingRes = await supabaseRest(
+      `subscribers?email=eq.${encodeURIComponent(email.toLowerCase())}&select=id,confirmed`
+    );
+    const existing = await existingRes.json();
 
-    if (existing) {
-      if (existing.confirmed) {
+    if (existing && existing.length > 0) {
+      if (existing[0].confirmed) {
         return new Response(
           JSON.stringify({ success: true, message: "Already subscribed!" }),
-          {
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
+          { headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
-      // Re-confirm if previously unconfirmed
-      const { error } = await supabase
-        .from("subscribers")
-        .update({ confirmed: true })
-        .eq("id", existing.id);
+      // Re-confirm
+      const updateRes = await supabaseRest(`subscribers?id=eq.${existing[0].id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ confirmed: true }),
+      });
 
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+      if (!updateRes.ok) {
+        const data = await updateRes.json();
+        return new Response(JSON.stringify({ error: data.message }), {
           status: 500,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         });
@@ -86,21 +95,20 @@ export default async (request) => {
 
       return new Response(
         JSON.stringify({ success: true, message: "Welcome back! You're now subscribed." }),
-        {
-          status: 201,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        }
+        { status: 201, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
     // New subscriber
-    const { error } = await supabase.from("subscribers").insert({
-      email: email.toLowerCase(),
-      confirmed: true,
+    const res = await supabaseRest("subscribers", {
+      method: "POST",
+      body: JSON.stringify({ email: email.toLowerCase(), confirmed: true }),
     });
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    const data = await res.json();
+
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
@@ -108,10 +116,7 @@ export default async (request) => {
 
     return new Response(
       JSON.stringify({ success: true, message: "Subscribed! Welcome aboard." }),
-      {
-        status: 201,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      { status: 201, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 

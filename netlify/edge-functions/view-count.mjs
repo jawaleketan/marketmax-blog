@@ -1,14 +1,25 @@
-import { createClient } from "@supabase/supabase-js";
-
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+function supabaseRest(path, options = {}) {
+  const url = `${supabaseUrl}/rest/v1/${path}`;
+  return fetch(url, {
+    ...options,
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      Prefer: options.prefer || "return=representation",
+      ...options.headers,
+    },
+  });
+}
 
 export default async (request) => {
   if (request.method === "OPTIONS") {
@@ -19,15 +30,12 @@ export default async (request) => {
   const slug = url.searchParams.get("slug");
 
   if (!slug) {
-    // Return all view counts (for popular posts sidebar)
     if (request.method === "GET") {
-      const { data, error } = await supabase
-        .from("page_views")
-        .select("slug, count")
-        .order("count", { ascending: false });
+      const res = await supabaseRest("page_views?select=slug,count&order=count.desc");
+      const data = await res.json();
 
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+      if (!res.ok) {
+        return new Response(JSON.stringify({ error: data.message }), {
           status: 500,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         });
@@ -45,27 +53,25 @@ export default async (request) => {
   }
 
   if (request.method === "GET") {
-    const { data } = await supabase
-      .from("page_views")
-      .select("count")
-      .eq("slug", slug)
-      .single();
+    const res = await supabaseRest(`page_views?slug=eq.${encodeURIComponent(slug)}&select=count`);
+    const data = await res.json();
+    const count = data?.[0]?.count || 0;
 
-    return new Response(
-      JSON.stringify({ slug, count: data?.count || 0 }),
-      {
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    return new Response(JSON.stringify({ slug, count }), {
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
   }
 
   if (request.method === "POST") {
-    const { data, error } = await supabase.rpc("increment_view_count", {
-      p_slug: slug,
+    // Use RPC to call the atomic increment function
+    const res = await supabaseRest("rpc/increment_view_count", {
+      method: "POST",
+      body: JSON.stringify({ p_slug: slug }),
     });
+    const data = await res.json();
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message || data }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });

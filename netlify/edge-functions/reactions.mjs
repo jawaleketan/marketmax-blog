@@ -1,12 +1,25 @@
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
+
+function supabaseRest(path, options = {}) {
+  const url = `${supabaseUrl}/rest/v1/${path}`;
+  return fetch(url, {
+    ...options,
+    headers: {
+      apikey: supabaseKey,
+      Authorization: `Bearer ${supabaseKey}`,
+      "Content-Type": "application/json",
+      Prefer: options.prefer || "return=representation",
+      ...options.headers,
+    },
+  });
+}
 
 const VALID_TYPES = ["like", "helpful", "insightful"];
 
@@ -26,13 +39,13 @@ export default async (request) => {
       });
     }
 
-    const { data, error } = await supabase
-      .from("reactions")
-      .select("type")
-      .eq("slug", slug);
+    const res = await supabaseRest(
+      `reactions?slug=eq.${encodeURIComponent(slug)}&select=type`
+    );
+    const data = await res.json();
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
@@ -81,35 +94,18 @@ export default async (request) => {
       );
     }
 
-    if (fingerprint.length > 200) {
-      return new Response(JSON.stringify({ error: "Invalid fingerprint" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      });
-    }
+    // Check if user already reacted
+    const existingRes = await supabaseRest(
+      `reactions?slug=eq.${encodeURIComponent(bodySlug)}&type=eq.${type}&fingerprint=eq.${encodeURIComponent(fingerprint)}&select=id`
+    );
+    const existing = await existingRes.json();
 
-    // Check if user already reacted with this type on this post
-    const { data: existing } = await supabase
-      .from("reactions")
-      .select("id")
-      .eq("slug", bodySlug)
-      .eq("type", type)
-      .eq("fingerprint", fingerprint)
-      .single();
-
-    if (existing) {
+    if (existing && existing.length > 0) {
       // Toggle off — remove reaction
-      const { error } = await supabase
-        .from("reactions")
-        .delete()
-        .eq("id", existing.id);
-
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-          status: 500,
-          headers: { "Content-Type": "application/json", ...corsHeaders },
-        });
-      }
+      await supabaseRest(`reactions?id=eq.${existing[0].id}`, {
+        method: "DELETE",
+        prefer: "return=minimal",
+      });
 
       return new Response(JSON.stringify({ toggled: "removed", type }), {
         headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -117,14 +113,15 @@ export default async (request) => {
     }
 
     // Add reaction
-    const { error } = await supabase.from("reactions").insert({
-      slug: bodySlug,
-      type,
-      fingerprint,
+    const res = await supabaseRest("reactions", {
+      method: "POST",
+      body: JSON.stringify({ slug: bodySlug, type, fingerprint }),
     });
 
-    if (error) {
-      return new Response(JSON.stringify({ error: error.message }), {
+    const data = await res.json();
+
+    if (!res.ok) {
+      return new Response(JSON.stringify({ error: data.message }), {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
