@@ -41,15 +41,31 @@ export const handler = async (event) => {
     if (event.httpMethod === "POST") {
       const { slug } = JSON.parse(event.body || "{}");
       if (!slug) return error(400, "Missing slug");
-      const raw = await store.get(slug);
-      const current = raw ? parseInt(raw, 10) : 0;
-      const next = current + 1;
-      await store.set(slug, String(next));
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ slug, count: next }),
-      };
+
+      // Retry loop to handle concurrent writes (race condition fix)
+      for (let attempt = 0; attempt < 5; attempt++) {
+        const { value, metadata } = await store.getWithMetadata(slug);
+        const current = value ? parseInt(value, 10) : 0;
+        const next = current + 1;
+
+        try {
+          await store.set(slug, String(next), {
+            metadata: {
+              etag: metadata?.etag,
+              updatedAt: new Date().toISOString(),
+            },
+          });
+          return {
+            statusCode: 200,
+            headers,
+            body: JSON.stringify({ slug, count: next }),
+          };
+        } catch (e) {
+          // ETag mismatch — retry with fresh value
+          if (attempt === 4) throw e;
+          continue;
+        }
+      }
     }
 
     return error(405, "Method not allowed");

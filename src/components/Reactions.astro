@@ -1,0 +1,113 @@
+---
+
+---
+
+<div class="my-8 p-5 rounded-lg bg-bg-card border border-border-default">
+  <div class="flex items-center gap-4 flex-wrap">
+    <span class="text-[10px] font-mono text-text-muted uppercase tracking-widest">Was this helpful?</span>
+    <div class="flex items-center gap-2">
+      <button
+        data-reaction="like"
+        class="reaction-btn group flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all text-xs font-mono"
+        aria-label="Like this post"
+      >
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/>
+        </svg>
+        <span class="count">0</span>
+      </button>
+
+      <button
+        data-reaction="helpful"
+        class="reaction-btn group flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all text-xs font-mono"
+        aria-label="Mark as helpful"
+      >
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+          <path d="M9 18h6"/><path d="M10 22h4"/>
+        </svg>
+        <span class="count">0</span>
+      </button>
+
+      <button
+        data-reaction="insightful"
+        class="reaction-btn group flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all text-xs font-mono"
+        aria-label="Mark as insightful"
+      >
+        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v8"/><path d="m4.93 10.93 1.41 1.41"/><path d="M2 18h2"/><path d="M20 18h2"/><path d="m19.07 10.93-1.41 1.41"/><path d="M22 22H2"/><path d="m8 6 4-4 4 4"/>
+          <path d="M16 18a4 4 0 0 0-8 0"/>
+        </svg>
+        <span class="count">0</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const slug = document.querySelector("main")?.getAttribute("data-post-slug");
+    if (!slug) return;
+
+    // Generate or retrieve persistent fingerprint
+    function getFingerprint() {
+      let fp = localStorage.getItem("reaction-fingerprint");
+      if (!fp) {
+        fp = crypto.randomUUID();
+        localStorage.setItem("reaction-fingerprint", fp);
+      }
+      return fp;
+    }
+
+    const fingerprint = getFingerprint();
+    const buttons = document.querySelectorAll(".reaction-btn");
+
+    // Load current counts
+    function loadCounts() {
+      fetch(`/api/reactions?slug=${encodeURIComponent(slug)}`)
+        .then((r) => r.json())
+        .then((counts) => {
+          buttons.forEach((btn) => {
+            const type = btn.getAttribute("data-reaction");
+            const countEl = btn.querySelector(".count");
+            if (countEl && counts[type] !== undefined) {
+              countEl.textContent = counts[type];
+            }
+          });
+        })
+        .catch(() => {});
+    }
+
+    // Toggle reaction on click
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const type = btn.getAttribute("data-reaction");
+        btn.classList.add("pointer-events-none", "opacity-50");
+
+        try {
+          const res = await fetch("/api/reactions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug, type, fingerprint }),
+          });
+
+          if (res.ok) {
+            // Visual feedback
+            if (!btn.classList.contains("reacted")) {
+              btn.classList.add("reacted", "border-accent-primary/30", "text-accent-primary");
+            } else {
+              btn.classList.remove("reacted", "border-accent-primary/30", "text-accent-primary");
+            }
+          }
+        } catch {
+          // Silently fail
+        } finally {
+          btn.classList.remove("pointer-events-none", "opacity-50");
+          loadCounts();
+        }
+      });
+    });
+
+    loadCounts();
+  })();
+</script>

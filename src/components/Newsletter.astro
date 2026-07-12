@@ -1,5 +1,7 @@
 ---
 
+---
+
 <div class="card-hover p-6 sm:p-8 rounded-lg border border-border-default bg-bg-surface">
   <div class="max-w-lg mx-auto text-center">
     <div class="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-accent-subtle border border-accent-primary/20 text-xs font-mono text-accent-primary mb-4">
@@ -9,6 +11,8 @@
     <h3 class="text-lg font-bold text-text-primary mb-2">Get Free Marketing Insights</h3>
     <p class="text-xs text-text-muted mb-6 leading-relaxed">No spam. Unsubscribe anytime. Weekly digital marketing tips, strategies, and tools.</p>
     <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2">
+      <!-- Honeypot field for spam prevention -->
+      <input name="website" type="text" class="hidden" tabindex="-1" autocomplete="off" />
       <input id="newsletter-email" type="email" placeholder="$ email@example.com" required autocomplete="email"
         class="flex-1 px-4 py-2.5 rounded-md bg-bg-base border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all duration-150 text-xs font-mono" />
       <button id="newsletter-submit" type="submit" class="px-5 py-2.5 rounded-md bg-accent-primary text-black font-semibold text-xs font-mono hover:bg-accent-hover transition-all duration-150 whitespace-nowrap">
@@ -29,46 +33,43 @@
 
     form.addEventListener("submit", function(e) {
       e.preventDefault();
+
+      // Check honeypot
+      var honeypot = form.querySelector('input[name="website"]');
+      if (honeypot && honeypot.value) return;
+
       var val = email.value.trim();
       if (!val) return;
       submit.disabled = true;
       submit.textContent = "subscribing...";
       msg.textContent = "One moment...";
+      msg.style.color = "";
 
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", "https://buttondown.com/api/emails/embed-subscribe/marketmax", true);
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.onload = function() {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          try {
-            var data = JSON.parse(xhr.responseText);
-            if (data.success || data.status === "pending") {
-              msg.textContent = "You're in! Check your inbox to confirm.";
-              msg.style.color = "var(--color-tag-seo)";
-              email.value = "";
-            } else {
-              msg.textContent = data.error || "Something went wrong. Try again.";
-              msg.style.color = "var(--color-tag-seo)";
-            }
-          } catch {
-            msg.textContent = "You're in! Check your inbox to confirm.";
+      // Subscribe via Supabase API
+      fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: val }),
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            msg.textContent = data.message || "Subscribed! Welcome aboard.";
             msg.style.color = "var(--color-tag-seo)";
             email.value = "";
+          } else {
+            msg.textContent = data.error || "Something went wrong. Try again.";
+            msg.style.color = "var(--color-tag-analytics)";
           }
-        } else {
-          msg.textContent = "Something went wrong. Try again.";
-          msg.style.color = "var(--color-tag-seo)";
-        }
-        submit.disabled = false;
-        submit.textContent = "subscribe &rarr;";
-      };
-      xhr.onerror = function() {
-        msg.textContent = "Network error. Try again.";
-        msg.style.color = "var(--color-tag-seo)";
-        submit.disabled = false;
-        submit.textContent = "subscribe &rarr;";
-      };
-      xhr.send("email=" + encodeURIComponent(val));
+          submit.disabled = false;
+          submit.textContent = "subscribe →";
+        })
+        .catch(function() {
+          msg.textContent = "Network error. Try again.";
+          msg.style.color = "var(--color-tag-analytics)";
+          submit.disabled = false;
+          submit.textContent = "subscribe →";
+        });
     });
   })();
 </script>

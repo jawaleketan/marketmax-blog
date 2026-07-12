@@ -7,6 +7,9 @@ import BlogCard from "../components/BlogCard.astro";
 import Breadcrumb from "../components/Breadcrumb.astro";
 import PopularPosts from "../components/PopularPosts.astro";
 import SeriesNav from "../components/SeriesNav.astro";
+import Comments from "../components/Comments.astro";
+import Reactions from "../components/Reactions.astro";
+import BookmarkBtn from "../components/BookmarkBtn.astro";
 import { render, getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 
@@ -173,6 +176,7 @@ const relatedPosts = allPosts
         <button id="copy-link-btn" data-url={`https://marketmax-blog.netlify.app/blog/${post.id}`} class="w-9 h-9 flex items-center justify-center rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all" aria-label="Copy link">
           <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         </button>
+        <BookmarkBtn />
       </div>
     </div>
 
@@ -208,6 +212,8 @@ const relatedPosts = allPosts
       </section>
     )}
 
+    <Reactions />
+    <Comments />
     <div><Newsletter /></div>
   </main>
   <Footer />
