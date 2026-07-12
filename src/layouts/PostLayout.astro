@@ -69,7 +69,7 @@ const relatedPosts = allPosts
     }
   `} />
   <Header />
-  <main class="container-article pt-4 pb-16 sm:pt-8 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
+  <main class="container-article py-16 sm:py-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
     <Breadcrumb items={[
       { href: "/blog", label: "blog" },
       { href: `/categories/${post.data.category}`, label: post.data.category.replace("-", " ") },
@@ -219,17 +219,9 @@ const relatedPosts = allPosts
   <Footer />
 
   <script>
-    document.addEventListener("astro:page-load", () => {
+    (function() {
       const main = document.querySelector("main[data-post-slug]");
       const slug = main ? main.getAttribute("data-post-slug") : "";
-      if (!slug) return;
-
-      const controller = new AbortController();
-      const { signal } = controller;
-
-      document.addEventListener("astro:before-swap", () => {
-        controller.abort();
-      }, { once: true });
 
       fetch("/api/view-count?slug=" + encodeURIComponent(slug))
         .then(function(r) { return r.json(); })
@@ -257,7 +249,7 @@ const relatedPosts = allPosts
             copyBtn.innerHTML = '<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
             setTimeout(function() { copyBtn.innerHTML = original; }, 2000);
           });
-        }, { signal });
+        });
       }
 
       document.addEventListener("keydown", function(e) {
@@ -270,7 +262,7 @@ const relatedPosts = allPosts
           var nextUrl = main ? main.getAttribute("data-next-url") : "";
           if (nextUrl) window.location.href = nextUrl;
         }
-      }, { signal });
+      });
 
       var tocLists = document.querySelectorAll(".toc-list");
       var article = document.querySelector(".prose");
@@ -308,9 +300,9 @@ const relatedPosts = allPosts
           updateActive();
           window.addEventListener("scroll", function() {
             requestAnimationFrame(updateActive);
-          }, { signal });
+          });
         }
       }
-    });
+    })();
   </script>
 </BaseLayout>

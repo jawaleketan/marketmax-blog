@@ -17,17 +17,17 @@
 </div>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    const overlay = document.getElementById("search-overlay");
-    const input = document.getElementById("search-overlay-input");
-    const results = document.getElementById("search-overlay-results");
-    let pagefindLoaded = false;
+  (function() {
+    var overlay = document.getElementById("search-overlay");
+    var input = document.getElementById("search-overlay-input");
+    var results = document.getElementById("search-overlay-results");
+    var pagefindLoaded = false;
 
     function openSearch() {
       if (!overlay || !input) return;
       overlay.classList.add("open");
       document.body.style.overflow = "hidden";
-      setTimeout(() => { input.focus(); }, 100);
+      setTimeout(function() { input.focus(); }, 100);
       if (!pagefindLoaded) {
         loadPagefind();
       }
@@ -43,17 +43,17 @@
 
     function loadPagefind() {
       if (pagefindLoaded) return;
-      const script = document.createElement("script");
+      var script = document.createElement("script");
       script.src = "/pagefind/pagefind.js";
       script.async = true;
-      script.onload = () => { pagefindLoaded = true; };
+      script.onload = function() { pagefindLoaded = true; };
       document.head.appendChild(script);
     }
 
     window.__openSearch = openSearch;
     window.__closeSearch = closeSearch;
 
-    document.addEventListener("keydown", (e) => {
+    document.addEventListener("keydown", function(e) {
       if ((e.ctrlKey || e.metaKey) && e.key === "k") {
         e.preventDefault();
         if (overlay && overlay.classList.contains("open")) {
@@ -68,7 +68,7 @@
     });
 
     if (overlay) {
-      overlay.addEventListener("click", (e) => {
+      overlay.addEventListener("click", function(e) {
         if (e.target === overlay || e.target.classList.contains("search-overlay-backdrop")) {
           closeSearch();
         }
@@ -76,38 +76,40 @@
     }
 
     if (input && results) {
-      let debounceTimer;
-      input.addEventListener("input", () => {
+      var debounceTimer;
+      input.addEventListener("input", function() {
         clearTimeout(debounceTimer);
-        const query = input.value.trim();
+        var query = input.value.trim();
         if (query.length < 2) {
           results.innerHTML = '<div class="search-overlay-hint">Type at least 2 characters to search</div>';
           return;
         }
-        debounceTimer = setTimeout(() => performSearch(query), 200);
+        debounceTimer = setTimeout(function() {
+          performSearch(query);
+        }, 200);
       });
 
-      input.addEventListener("keydown", (e) => {
+      input.addEventListener("keydown", function(e) {
         if (e.key === "Escape") closeSearch();
-        const items = results.querySelectorAll("a");
+        var items = results.querySelectorAll("a");
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          const first = items[0];
+          var first = items[0];
           if (first) first.focus();
         }
       });
 
-      results.addEventListener("keydown", (e) => {
-        const items = Array.from(results.querySelectorAll("a"));
+      results.addEventListener("keydown", function(e) {
+        var items = Array.from(results.querySelectorAll("a"));
         if (items.length === 0) return;
-        const currentIdx = items.indexOf(document.activeElement);
+        var currentIdx = items.indexOf(document.activeElement);
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          const next = (currentIdx + 1) % items.length;
+          var next = (currentIdx + 1) % items.length;
           items[next].focus();
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          const prev = currentIdx <= 0 ? items.length - 1 : currentIdx - 1;
+          var prev = currentIdx <= 0 ? items.length - 1 : currentIdx - 1;
           items[prev].focus();
         } else if (e.key === "Escape") {
           closeSearch();
@@ -119,39 +121,37 @@
       if (typeof window.Pagefind === "undefined" || !window.Pagefind) {
         results.innerHTML = '<div class="search-overlay-hint">Loading search index...</div>';
         if (!pagefindLoaded) loadPagefind();
-        const checkReady = setInterval(() => {
+        var checkReady = setInterval(function() {
           if (typeof window.Pagefind !== "undefined" && window.Pagefind) {
             clearInterval(checkReady);
             performSearch(query);
           }
         }, 300);
-        setTimeout(() => clearInterval(checkReady), 10000);
+        setTimeout(function() { clearInterval(checkReady); }, 10000);
         return;
       }
       try {
-        const search = await window.Pagefind.search(query);
+        var search = await window.Pagefind.search(query);
         if (!search || !search.results || search.results.length === 0) {
           results.innerHTML = '<div class="search-overlay-empty">// no results for "' + query + '"</div>';
           return;
         }
-        const items = await Promise.all(
-          search.results.slice(0, 8).map(async (r) => {
-            const data = await r.data();
-            const cat = data.meta && data.meta.category ? data.meta.category : "";
-            const catBadge = cat ? '<span class="search-result-cat">' + cat + "</span>" : "";
-            return '<a href="' + data.url + '" class="search-result-item" tabindex="0">' +
-              '<div class="search-result-title">' + data.title + "</div>" +
-              '<div class="search-result-excerpt">' + data.excerpt + "</div>" +
-              catBadge +
-              "</a>";
-          })
-        );
+        var items = await Promise.all(search.results.slice(0, 8).map(async function(r) {
+          var data = await r.data();
+          var cat = data.meta && data.meta.category ? data.meta.category : "";
+          var catBadge = cat ? '<span class="search-result-cat">' + cat + "</span>" : "";
+          return '<a href="' + data.url + '" class="search-result-item" tabindex="0">' +
+            '<div class="search-result-title">' + data.title + "</div>" +
+            '<div class="search-result-excerpt">' + data.excerpt + "</div>" +
+            catBadge +
+            "</a>";
+        }));
         results.innerHTML = '<div class="search-result-list">' + items.join("") + "</div>";
-        const first = results.querySelector("a");
+        var first = results.querySelector("a");
         if (first) first.setAttribute("data-first", "true");
       } catch (err) {
         results.innerHTML = '<div class="search-overlay-empty">// search error — try again</div>';
       }
     }
-  });
+  })();
 </script>

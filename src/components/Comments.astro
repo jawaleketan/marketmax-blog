@@ -73,144 +73,142 @@
 
 <script>
   (function () {
-    document.addEventListener('astro:page-load', () => {
-      const slug = document.querySelector("main")?.getAttribute("data-post-slug");
-      if (!slug) return;
+    const slug = document.querySelector("main")?.getAttribute("data-post-slug");
+    if (!slug) return;
 
-      const list = document.getElementById("comments-list");
-      const form = document.getElementById("comment-form");
-      const countEl = document.getElementById("comments-count");
-      const msgEl = document.getElementById("comment-msg");
-      const submitBtn = document.getElementById("comment-submit");
-      const bodyField = document.getElementById("comment-body");
-      const charCount = document.getElementById("char-count");
+    const list = document.getElementById("comments-list");
+    const form = document.getElementById("comment-form");
+    const countEl = document.getElementById("comments-count");
+    const msgEl = document.getElementById("comment-msg");
+    const submitBtn = document.getElementById("comment-submit");
+    const bodyField = document.getElementById("comment-body");
+    const charCount = document.getElementById("char-count");
 
-      // Character count
-      bodyField?.addEventListener("input", () => {
-        const len = bodyField.value.length;
-        if (charCount) {
-          charCount.textContent = `${len} / 2000`;
-          charCount.className = `text-[10px] font-mono ${len > 1800 ? "text-accent-primary" : "text-text-muted"}`;
-        }
-      });
+    // Character count
+    bodyField?.addEventListener("input", () => {
+      const len = bodyField.value.length;
+      if (charCount) {
+        charCount.textContent = `${len} / 2000`;
+        charCount.className = `text-[10px] font-mono ${len > 1800 ? "text-accent-primary" : "text-text-muted"}`;
+      }
+    });
 
-      // Load existing comments
-      function loadComments() {
-        fetch(`/api/comments?slug=${encodeURIComponent(slug)}`)
-          .then((r) => r.json())
-          .then((comments) => {
-            if (!comments.length) {
-              list.innerHTML = '<p class="text-xs font-mono text-text-muted py-4">No comments yet. Be the first to share your thoughts!</p>';
-              if (countEl) countEl.textContent = "(0)";
-              return;
-            }
-            if (countEl) countEl.textContent = `(${comments.length})`;
+    // Load existing comments
+    function loadComments() {
+      fetch(`/api/comments?slug=${encodeURIComponent(slug)}`)
+        .then((r) => r.json())
+        .then((comments) => {
+          if (!comments.length) {
+            list.innerHTML = '<p class="text-xs font-mono text-text-muted py-4">No comments yet. Be the first to share your thoughts!</p>';
+            if (countEl) countEl.textContent = "(0)";
+            return;
+          }
+          if (countEl) countEl.textContent = `(${comments.length})`;
 
-            list.innerHTML = comments
-              .map(
-                (c) => `
-              <div class="p-4 rounded-lg bg-bg-card border border-border-default">
-                <div class="flex items-center gap-3 mb-2">
-                  <div class="w-8 h-8 rounded-full bg-bg-hover flex items-center justify-center text-xs font-mono font-bold text-accent-primary">
-                    ${c.author_name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <span class="text-sm font-semibold text-text-primary">${escapeHtml(c.author_name)}</span>
-                    <span class="text-[10px] font-mono text-text-muted block">${timeAgo(c.created_at)}</span>
-                  </div>
+          list.innerHTML = comments
+            .map(
+              (c) => `
+            <div class="p-4 rounded-lg bg-bg-card border border-border-default">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="w-8 h-8 rounded-full bg-bg-hover flex items-center justify-center text-xs font-mono font-bold text-accent-primary">
+                  ${c.author_name.charAt(0).toUpperCase()}
                 </div>
-                <p class="text-sm text-text-secondary leading-relaxed pl-11">${escapeHtml(c.body)}</p>
+                <div>
+                  <span class="text-sm font-semibold text-text-primary">${escapeHtml(c.author_name)}</span>
+                  <span class="text-[10px] font-mono text-text-muted block">${timeAgo(c.created_at)}</span>
+                </div>
               </div>
-            `
-              )
-              .join("");
-          })
-          .catch(() => {
-            list.innerHTML = '<p class="text-xs font-mono text-text-muted">Could not load comments.</p>';
-          });
+              <p class="text-sm text-text-secondary leading-relaxed pl-11">${escapeHtml(c.body)}</p>
+            </div>
+          `
+            )
+            .join("");
+        })
+        .catch(() => {
+          list.innerHTML = '<p class="text-xs font-mono text-text-muted">Could not load comments.</p>';
+        });
+    }
+
+    // Submit comment
+    form?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const name = fd.get("author_name")?.toString().trim();
+      const email = fd.get("author_email")?.toString().trim();
+      const body = fd.get("body")?.toString().trim();
+
+      if (!name || !body) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "submitting...";
+      if (msgEl) {
+        msgEl.textContent = "Submitting...";
+        msgEl.style.color = "";
       }
 
-      // Submit comment
-      form?.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const fd = new FormData(form);
-        const name = fd.get("author_name")?.toString().trim();
-        const email = fd.get("author_email")?.toString().trim();
-        const body = fd.get("body")?.toString().trim();
+      try {
+        const res = await fetch("/api/comments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug,
+            author_name: name,
+            author_email: email || null,
+            body,
+          }),
+        });
 
-        if (!name || !body) return;
+        const data = await res.json();
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = "submitting...";
-        if (msgEl) {
-          msgEl.textContent = "Submitting...";
-          msgEl.style.color = "";
-        }
-
-        try {
-          const res = await fetch("/api/comments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              slug,
-              author_name: name,
-              author_email: email || null,
-              body,
-            }),
-          });
-
-          const data = await res.json();
-
-          if (res.ok) {
-            form.reset();
-            if (charCount) charCount.textContent = "0 / 2000";
-            if (msgEl) {
-              msgEl.textContent = data.message || "Comment submitted for moderation!";
-              msgEl.style.color = "var(--color-tag-seo)";
-            }
-            setTimeout(() => {
-              if (msgEl) msgEl.textContent = "";
-            }, 8000);
-          } else {
-            if (msgEl) {
-              msgEl.textContent = data.error || "Something went wrong. Try again.";
-              msgEl.style.color = "var(--color-tag-analytics)";
-            }
-          }
-        } catch {
+        if (res.ok) {
+          form.reset();
+          if (charCount) charCount.textContent = "0 / 2000";
           if (msgEl) {
-            msgEl.textContent = "Network error. Try again.";
+            msgEl.textContent = data.message || "Comment submitted for moderation!";
+            msgEl.style.color = "var(--color-tag-seo)";
+          }
+          setTimeout(() => {
+            if (msgEl) msgEl.textContent = "";
+          }, 8000);
+        } else {
+          if (msgEl) {
+            msgEl.textContent = data.error || "Something went wrong. Try again.";
             msgEl.style.color = "var(--color-tag-analytics)";
           }
-        } finally {
-          submitBtn.disabled = false;
-          submitBtn.textContent = "submit comment →";
         }
-      });
-
-      function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
+      } catch {
+        if (msgEl) {
+          msgEl.textContent = "Network error. Try again.";
+          msgEl.style.color = "var(--color-tag-analytics)";
+        }
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "submit comment →";
       }
-
-      function timeAgo(dateStr) {
-        const now = new Date();
-        const date = new Date(dateStr);
-        const seconds = Math.floor((now - date) / 1000);
-        if (seconds < 60) return "just now";
-        const minutes = Math.floor(seconds / 60);
-        if (minutes < 60) return `${minutes}m ago`;
-        const hours = Math.floor(minutes / 60);
-        if (hours < 24) return `${hours}h ago`;
-        const days = Math.floor(hours / 24);
-        if (days < 30) return `${days}d ago`;
-        const months = Math.floor(days / 30);
-        if (months < 12) return `${months}mo ago`;
-        return `${Math.floor(months / 12)}y ago`;
-      }
-
-      loadComments();
     });
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function timeAgo(dateStr) {
+      const now = new Date();
+      const date = new Date(dateStr);
+      const seconds = Math.floor((now - date) / 1000);
+      if (seconds < 60) return "just now";
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days < 30) return `${days}d ago`;
+      const months = Math.floor(days / 30);
+      if (months < 12) return `${months}mo ago`;
+      return `${Math.floor(months / 12)}y ago`;
+    }
+
+    loadComments();
   })();
 </script>
