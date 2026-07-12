@@ -20,9 +20,9 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
 
     {featuredPost && (
       <section class="container-blog mb-14 animate-fade-in-up">
-        <div class="flex items-center gap-2 my-6 text-text-muted">
-          <span class="text-[11px] font-mono whitespace-nowrap">--- [ Featured ]</span>
-          <div class="flex-grow border-t border-dashed border-border-default"></div>
+        <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+          <span>--- [ FEATURED ]</span>
+          <div class="flex-grow border-t border-dashed border-zinc-800"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />
@@ -31,9 +31,9 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     )}
 
     <section class="container-blog mb-14 animate-fade-in-up">
-      <div class="flex items-center gap-2 my-6 text-text-muted">
-        <span class="text-[11px] font-mono whitespace-nowrap">--- [ Categories ]</span>
-        <div class="flex-grow border-t border-dashed border-border-default"></div>
+      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+        <span>--- [ CATEGORIES ]</span>
+        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
@@ -57,10 +57,10 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     </section>
 
     <section class="container-blog mb-20 animate-fade-in-up">
-      <div class="flex items-center gap-2 my-6 text-text-muted">
-        <span class="text-[11px] font-mono whitespace-nowrap">--- [ Latest ]</span>
-        <div class="flex-grow border-t border-dashed border-border-default"></div>
-        <a href="/blog" class="text-[11px] font-mono whitespace-nowrap hover:text-accent-primary transition-colors">view all &rarr;</a>
+      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+        <span>--- [ LATEST ]</span>
+        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
+        <a href="/blog" class="whitespace-nowrap hover:text-accent-primary transition-colors">view all &rarr;</a>
       </div>
       {recentPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -78,9 +78,9 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     </section>
 
     <section class="container-blog pb-20 animate-fade-in-up">
-      <div class="flex items-center gap-2 my-6 text-text-muted">
-        <span class="text-[11px] font-mono whitespace-nowrap">--- [ Stay Updated ]</span>
-        <div class="flex-grow border-t border-dashed border-border-default"></div>
+      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+        <span>--- [ STAY UPDATED ]</span>
+        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
       </div>
       <Newsletter />
     </section>
