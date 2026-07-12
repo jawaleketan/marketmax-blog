@@ -20,9 +20,10 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
 
     {featuredPost && (
       <section class="container-blog mb-14 animate-fade-in-up">
-        <div class="flex items-center gap-2 mb-5">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
-          <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Featured</h2>
+        <div class="flex items-center gap-3 mb-5">
+          <span class="text-[11px] font-mono text-text-muted">---</span>
+          <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">[ Featured ]</h2>
+          <span class="flex-1 h-px bg-border-default"></span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />
@@ -31,9 +32,10 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     )}
 
     <section class="container-blog mb-14 animate-fade-in-up">
-      <div class="flex items-center gap-2 mb-5">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
-        <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Categories</h2>
+      <div class="flex items-center gap-3 mb-5">
+        <span class="text-[11px] font-mono text-text-muted">---</span>
+        <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">[ Categories ]</h2>
+        <span class="flex-1 h-px bg-border-default"></span>
       </div>
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
@@ -57,11 +59,10 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     </section>
 
     <section class="container-blog mb-20 animate-fade-in-up">
-      <div class="flex items-center justify-between mb-5">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
-          <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Latest</h2>
-        </div>
+      <div class="flex items-center gap-3 mb-5">
+        <span class="text-[11px] font-mono text-text-muted">---</span>
+        <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">[ Latest ]</h2>
+        <span class="flex-1 h-px bg-border-default"></span>
         <a href="/blog" class="text-xs font-mono text-text-muted hover:text-accent-primary transition-colors">view all &rarr;</a>
       </div>
       {recentPosts.length > 0 ? (
@@ -80,9 +81,10 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     </section>
 
     <section class="container-blog pb-20 animate-fade-in-up">
-      <div class="flex items-center gap-2 mb-5">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
-        <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Stay Updated</h2>
+      <div class="flex items-center gap-3 mb-5">
+        <span class="text-[11px] font-mono text-text-muted">---</span>
+        <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">[ Stay Updated ]</h2>
+        <span class="flex-1 h-px bg-border-default"></span>
       </div>
       <Newsletter />
     </section>
