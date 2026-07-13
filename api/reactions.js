@@ -28,6 +28,18 @@ export default async (request) => {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    if (request.method === "GET") {
+      return new Response(JSON.stringify({ like: 0, helpful: 0, insightful: 0 }), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    return new Response(JSON.stringify({ error: "Service unavailable locally" }), {
+      status: 503,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+
   const url = new URL(request.url);
   const slug = url.searchParams.get("slug");
 

@@ -26,6 +26,13 @@ export default async (request) => {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    return new Response(JSON.stringify({ error: "Service unavailable locally" }), {
+      status: 503,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+
   // Get user from Netlify Identity JWT
   const authHeader = request.headers.get("Authorization");
   let userId = null;

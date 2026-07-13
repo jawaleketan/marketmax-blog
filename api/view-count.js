@@ -20,6 +20,24 @@ export default async (request) => {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    if (request.method === "GET") {
+      const url = new URL(request.url);
+      const slug = url.searchParams.get("slug");
+      if (slug) {
+        return new Response(JSON.stringify({ slug, count: 0 }), {
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        });
+      }
+      return new Response(JSON.stringify({}), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    return new Response(JSON.stringify({ slug: "", count: 0 }), {
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+
   const url = new URL(request.url);
   let slug = url.searchParams.get("slug");
 

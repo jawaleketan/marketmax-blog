@@ -30,6 +30,18 @@ export default async (request) => {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
+  if (!supabaseUrl || !supabaseKey) {
+    if (request.method === "GET") {
+      return new Response(JSON.stringify({ count: 0 }), {
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    return new Response(JSON.stringify({ success: true, message: "Service unavailable locally." }), {
+      status: 201,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
+    });
+  }
+
   if (request.method === "GET") {
     const res = await supabaseRest("subscribers?confirmed=eq.true&select=id");
     const data = await res.json();

@@ -252,8 +252,20 @@ main {
   gap: 0;
 }
 
-.container-blog { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-.container-article { max-width: 720px; margin: 0 auto; padding: 0 2rem; }
+.container-blog {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+.container-article {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
 
 /* ========================
    FLOATING NAVBAR
@@ -491,15 +503,13 @@ article, .terminal-box, header, footer {
   overflow-wrap: break-word;
 }
 
-article {
+article.card-bezel {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: auto;
-  min-height: 100%;
 }
 
-article > * + * {
+article.card-bezel > * + * {
   margin-top: 1rem;
 }
 
