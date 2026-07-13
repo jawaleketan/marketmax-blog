@@ -69,14 +69,14 @@ const relatedPosts = allPosts
     }
   `} />
   <Header />
-  <main class="container-article pt-10 pb-16 sm:pt-14 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
-    <div class="mb-8"><Breadcrumb items={[
+  <main class="container-article pt-16 pb-16 sm:pt-24 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
+    <div class="mb-10"><Breadcrumb items={[
       { href: "/blog", label: "blog" },
       { href: `/categories/${post.data.category}`, label: post.data.category.replace("-", " ") },
       { label: post.data.title },
     ]} /></div>
 
-    <div class="flex items-center gap-3 mb-5">
+    <div class="flex items-center gap-3 mb-6">
       <a
         href={`/categories/${post.data.category}`}
         class={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider border ${(() => {

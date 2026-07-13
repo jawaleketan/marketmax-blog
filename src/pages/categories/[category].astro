@@ -36,19 +36,19 @@ const descs: Record<Cat, string> = {
 <BaseLayout title={`${labels[category]}, MarketMax`} description={descs[category]}>
   <Header />
   <main class="animate-fade-in-up">
-    <div class="container-blog pt-6 pb-8 sm:pt-10 sm:pb-10">
+    <div class="container-blog pt-16 pb-10 sm:pt-24 sm:pb-12">
       <Breadcrumb items={[
         { href: "/blog", label: "blog" },
         { label: labels[category] },
       ]} />
     </div>
     <div class={`category-banner-${category} border-b border-border-default`}>
-      <div class="container-blog pb-16 sm:pb-20">
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">{labels[category]} Articles</h1>
+      <div class="container-blog pt-6 pb-16 sm:pt-8 sm:pb-20">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">{labels[category]} Articles</h1>
         <p class="text-sm font-mono text-text-secondary max-w-2xl">{descs[category]} <span class="text-text-muted">({filteredPosts.length} posts)</span></p>
       </div>
     </div>
-    <div class="container-blog pb-16 pt-2 sm:pb-20 sm:pt-4">
+    <div class="container-blog pb-16 pt-8 sm:pb-20 sm:pt-10">
     {filteredPosts.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredPosts.map((post) => <BlogCard post={post} />)}
