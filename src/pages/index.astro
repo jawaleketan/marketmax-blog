@@ -15,19 +15,19 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
 
 <BaseLayout title="MarketMax, Digital Marketing Insights" description="Digital marketing blog by Ketan Jawale. Learn SEO, social media, content marketing, PPC, and analytics with actionable guides.">
   <Header />
-  <main>
+  <main class="space-y-8 md:space-y-12">
     <Hero />
 
     {featuredPost && (
-      <section class="container-blog py-20 sm:py-24">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <section class="container-blog py-12 sm:py-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />
         </div>
       </section>
     )}
 
-    <section class="container-blog py-20 sm:py-24">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+    <section class="container-blog py-12 sm:py-16">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
           const count = allPosts.filter((p) => p.data.category === cat).length;
           const labels = { seo: "SEO", "social-media": "Social", "content-marketing": "Content", ppc: "PPC", analytics: "Analytics" };
@@ -48,14 +48,14 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       </div>
     </section>
 
-    <section class="container-blog py-20 sm:py-24">
+    <section class="container-blog py-12 sm:py-16">
       <div class="flex items-center gap-4 mb-10 text-text-muted font-mono tracking-wider text-xs uppercase">
         <span>--- [ LATEST ]</span>
         <div class="flex-grow border-t border-dashed border-border-default"></div>
         <a href="/blog" class="whitespace-nowrap hover:text-accent-primary transition-colors duration-200">view all &rarr;</a>
       </div>
       {recentPosts.length > 0 ? (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {recentPosts.map((post) => (
             <BlogCard post={post} />
           ))}
@@ -67,7 +67,7 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       )}
     </section>
 
-    <section class="container-blog py-20 sm:py-24">
+    <section class="container-blog py-12 sm:py-16">
       <Newsletter />
     </section>
   </main>

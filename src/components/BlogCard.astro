@@ -26,7 +26,7 @@ const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hove
       </div>
     )}
     <div class="card-bezel-inner flex flex-col flex-grow">
-      <div class="flex items-center gap-2 mb-3">
+      <div class="flex items-center gap-2 mb-4">
         <span class={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider border ${cat.tag}`}>
           <span class="w-1 h-1 rounded-full bg-current"></span>
           {cat.label}
@@ -40,11 +40,11 @@ const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hove
         {post.data.title}
       </h3>
 
-      <p class={`mt-1.5 text-text-muted leading-relaxed text-sm flex-grow`}>
+      <p class={`mt-2 text-text-muted leading-relaxed text-sm flex-grow`}>
         {post.data.description}
       </p>
 
-      <div class="mt-4 pt-4 border-t border-border-default/50 flex items-center gap-3 text-[11px] font-mono text-text-muted">
+      <div class="mt-6 pt-5 border-t border-border-default/50 flex items-center gap-3 text-[11px] font-mono text-text-muted">
         <span class="flex items-center gap-1">
           <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           {post.data.readingTime || "5 min read"}

@@ -209,7 +209,7 @@ const relatedPosts = allPosts
           </div>
           <a href={`/categories/${post.data.category}`} class="text-xs font-mono text-text-muted hover:text-accent-primary transition-colors">view all &rarr;</a>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {relatedPosts.map((related) => <BlogCard post={related} />)}
         </div>
       </section>

@@ -50,7 +50,7 @@ const descs: Record<Cat, string> = {
     </div>
     <div class="container-blog pb-20 pt-10 sm:pb-24 sm:pt-12">
     {filteredPosts.length > 0 ? (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {filteredPosts.map((post) => <BlogCard post={post} />)}
       </div>
     ) : (
