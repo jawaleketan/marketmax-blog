@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+export interface Props { post: CollectionEntry<"blog">; featured?: boolean; }
+
+const { post, featured = false } = Astro.props;
+
+type Category = "seo" | "social-media" | "content-marketing" | "ppc" | "analytics";
+
+const categoryStyles: Record<Category, { tag: string; label: string }> = {
+  seo: { tag: "bg-tag-seo/5 text-tag-seo border-tag-seo/20", label: "SEO" },
+  "social-media": { tag: "bg-tag-social/5 text-tag-social border-tag-social/20", label: "Social" },
+  "content-marketing": { tag: "bg-tag-content/5 text-tag-content border-tag-content/20", label: "Content" },
+  ppc: { tag: "bg-tag-ppc/5 text-tag-ppc border-tag-ppc/20", label: "PPC" },
+  analytics: { tag: "bg-tag-analytics/5 text-tag-analytics border-tag-analytics/20", label: "Analytics" },
+};
+
+const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hover text-text-muted border-border-default", label: post.data.category };
+---
+
+<article class={`card-bezel group relative flex flex-col ${featured ? "md:col-span-2 lg:col-span-2" : ""}`}>
+  <a href={`/blog/${post.id}`} class="flex flex-col flex-grow">
+    {post.data.image && (
+      <div class="aspect-[16/9] overflow-hidden bg-bg-surface">
+        <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]" loading="lazy" decoding="async" />
+      </div>
+    )}
+    <div class="card-bezel-inner flex flex-col flex-grow">
+      <div class="flex items-center gap-2 mb-4">
+        <span class={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider border ${cat.tag}`}>
+          <span class="w-1 h-1 rounded-full bg-current"></span>
+          {cat.label}
+        </span>
+        <span class="text-[10px] font-mono text-text-muted">
+          {new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(post.data.publishDate)}
+        </span>
+      </div>
+
+      <h3 class={`font-bold text-text-primary group-hover:text-accent-primary transition-colors duration-200 leading-snug ${featured ? "text-2xl tracking-tight" : "text-base"}`}>
+        {post.data.title}
+      </h3>
+
+      <p class={`mt-2 text-text-muted leading-relaxed text-sm flex-grow`}>
+        {post.data.description}
+      </p>
+
+      <div class="mt-6 pt-5 border-t border-border-default/50 flex items-center gap-3 text-[11px] font-mono text-text-muted">
+        <span class="flex items-center gap-1">
+          <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          {post.data.readingTime || "5 min read"}
+        </span>
+        <span class="flex items-center gap-1">
+          <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          {post.data.author}
+        </span>
+      </div>
+    </div>
+  </a>
+</article>

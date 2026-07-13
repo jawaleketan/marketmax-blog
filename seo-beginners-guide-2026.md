@@ -1,0 +1,47 @@
+---
+
+<div class="relative max-w-md" id="search-container">
+  <div class="relative">
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input id="search-input" type="text" placeholder="$ search articles..." class="w-full pl-9 pr-4 py-2.5 rounded-md bg-bg-card border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all duration-150 text-xs font-mono" aria-autocomplete="list" aria-controls="search-results" />
+  </div>
+  <div id="search-results" class="hidden mt-2" role="listbox" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script>
+  const searchInput = document.getElementById("search-input");
+  const searchResults = document.getElementById("search-results");
+
+  if (searchInput && searchResults) {
+    searchInput.addEventListener("input", async () => {
+      const query = searchInput.value.trim();
+      if (query.length < 2) { searchResults.classList.add("hidden"); return; }
+
+      if (typeof window.Pagefind === "undefined") {
+        searchResults.classList.remove("hidden");
+        searchResults.innerHTML = `<div class="p-4 rounded-lg bg-bg-card border border-border-default text-xs font-mono text-text-muted">// search available after build + pagefind indexing</div>`;
+        return;
+      }
+
+      searchResults.classList.remove("hidden");
+      try {
+        const search = await window.Pagefind.search(query);
+        if (search.results.length === 0) {
+          searchResults.innerHTML = `<div class="p-4 rounded-lg bg-bg-card border border-border-default text-xs font-mono text-text-muted">// no results for "${query}"</div>`;
+          return;
+        }
+        const items = await Promise.all(search.results.slice(0, 5).map(async (r) => {
+          const data = await r.data();
+          return `<a href="${data.url}" class="block p-3 rounded-md hover:bg-bg-hover transition-colors"><div class="text-xs font-medium text-text-primary font-mono">${data.title}</div><div class="text-[11px] font-mono text-text-muted mt-0.5">${data.excerpt}</div></a>`;
+        }));
+        searchResults.innerHTML = `<div class="rounded-lg bg-bg-card border border-border-default divide-y divide-border-default overflow-hidden">${items.join("")}</div>`;
+      } catch { /* ignore */ }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("search-container")?.contains(e.target)) searchResults.classList.add("hidden");
+    });
+  }
+</script>

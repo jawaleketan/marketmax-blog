@@ -1,0 +1,37 @@
+---
+
+<div class="w-full border-t border-dashed border-border-default my-10 md:my-12"></div>
+
+<footer class="container-blog grid grid-cols-1 md:grid-cols-3 gap-10 items-start text-sm text-text-secondary font-mono pb-20 md:pb-24">
+  <div>
+    <a href="/" class="inline-flex items-center gap-2 text-text-primary font-bold mb-4 hover:text-accent-primary transition-colors duration-200">
+      <span class="text-accent-primary">&gt;</span>
+      <span>marketmax</span>
+    </a>
+    <p class="leading-relaxed text-xs text-text-muted">
+      Free digital marketing insights: SEO, social media, content strategy, PPC, and analytics. No fluff, just value.
+    </p>
+  </div>
+  <div>
+    <h4 class="text-text-primary font-bold mb-4 text-xs tracking-wider uppercase">Categories</h4>
+    <ul class="space-y-2.5 leading-relaxed">
+      <li><a href="/categories/seo" class="hover:text-accent-primary transition-colors duration-200">$ cd seo</a></li>
+      <li><a href="/categories/social-media" class="hover:text-accent-primary transition-colors duration-200">$ cd social-media</a></li>
+      <li><a href="/categories/content-marketing" class="hover:text-accent-primary transition-colors duration-200">$ cd content-marketing</a></li>
+      <li><a href="/categories/ppc" class="hover:text-accent-primary transition-colors duration-200">$ cd ppc</a></li>
+      <li><a href="/categories/analytics" class="hover:text-accent-primary transition-colors duration-200">$ cd analytics</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="text-text-primary font-bold mb-4 text-xs tracking-wider uppercase">Connect</h4>
+    <ul class="space-y-2.5 leading-relaxed">
+      <li><a href="/about" class="hover:text-accent-primary transition-colors duration-200">$ cat about.md</a></li>
+      <li><a href="/rss.xml" class="hover:text-accent-primary transition-colors duration-200">$ cat rss.xml</a></li>
+      <li><a href="https://twitter.com/marketmax" target="_blank" rel="noopener noreferrer" class="hover:text-accent-primary transition-colors duration-200">$ cat twitter</a></li>
+      <li><a href="https://www.linkedin.com/in/ketanjawale" class="hover:text-accent-primary transition-colors duration-200">$ cat linkedin</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="container-blog pb-8 text-[11px] font-mono text-text-muted">
+  &copy; {new Date().getFullYear()} marketmax. built with astro.
+</div>

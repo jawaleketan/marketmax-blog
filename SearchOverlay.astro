@@ -1,0 +1,105 @@
+---
+
+---
+
+<button
+  id="bookmark-btn"
+  class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all text-xs font-mono"
+  aria-label="Bookmark this post"
+>
+  <svg id="bookmark-icon-outline" class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+  </svg>
+  <svg id="bookmark-icon-filled" class="w-3.5 h-3.5 hidden" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+  </svg>
+  <span id="bookmark-label">save</span>
+</button>
+
+<script>
+  (function () {
+    const slug = document.querySelector("main")?.getAttribute("data-post-slug");
+    const btn = document.getElementById("bookmark-btn");
+    const iconOutline = document.getElementById("bookmark-icon-outline");
+    const iconFilled = document.getElementById("bookmark-icon-filled");
+    const label = document.getElementById("bookmark-label");
+    if (!slug || !btn) return;
+
+    let isBookmarked = false;
+
+    function getToken() {
+      return localStorage.getItem("nf-token");
+    }
+
+    function updateUI() {
+      if (isBookmarked) {
+        iconOutline?.classList.add("hidden");
+        iconFilled?.classList.remove("hidden");
+        if (label) label.textContent = "saved";
+        btn.classList.add("border-accent-primary/30", "text-accent-primary");
+      } else {
+        iconOutline?.classList.remove("hidden");
+        iconFilled?.classList.add("hidden");
+        if (label) label.textContent = "save";
+        btn.classList.remove("border-accent-primary/30", "text-accent-primary");
+      }
+    }
+
+    // Check if already bookmarked
+    async function checkBookmark() {
+      const token = getToken();
+      if (!token) return;
+
+      try {
+        const res = await fetch("/api/bookmarks", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+
+        const bookmarks = await res.json();
+        isBookmarked = bookmarks.some((b) => b.slug === slug);
+        updateUI();
+      } catch {
+        // Not logged in or error
+      }
+    }
+
+    // Toggle bookmark
+    btn.addEventListener("click", async () => {
+      const token = getToken();
+      if (!token) {
+        // Redirect to login or show message
+        label.textContent = "log in to save";
+        setTimeout(() => {
+          label.textContent = "save";
+        }, 3000);
+        return;
+      }
+
+      btn.classList.add("pointer-events-none", "opacity-50");
+
+      try {
+        const res = await fetch("/api/bookmarks", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ slug }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          isBookmarked = data.bookmarked;
+          updateUI();
+        }
+      } catch {
+        // Silently fail
+      } finally {
+        btn.classList.remove("pointer-events-none", "opacity-50");
+      }
+    });
+
+    checkBookmark();
+  })();
+</script>

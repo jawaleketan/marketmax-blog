@@ -1,0 +1,76 @@
+---
+
+<div class="card-bezel p-8 sm:p-10">
+  <div class="card-bezel-inner">
+    <div class="max-w-lg mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-subtle border border-accent-primary/15 text-[11px] font-mono text-accent-primary mb-4">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
+        newsletter
+      </div>
+      <h3 class="text-lg font-bold text-text-primary mb-2 tracking-tight">Get Free Marketing Insights</h3>
+      <p class="text-xs text-text-muted mb-6 leading-relaxed">No spam. Unsubscribe anytime. Weekly digital marketing tips, strategies, and tools.</p>
+      <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2">
+        <!-- Honeypot field for spam prevention -->
+        <input name="website" type="text" class="hidden" tabindex="-1" autocomplete="off" />
+        <label for="newsletter-email" class="sr-only">Email address for newsletter</label>
+        <input id="newsletter-email" type="email" placeholder="$ email@example.com" required autocomplete="email"
+          class="flex-1 px-4 py-2.5 rounded-full bg-bg-base border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all duration-200 text-xs font-mono" />
+        <button id="newsletter-submit" type="submit" class="btn-primary font-mono text-xs !py-2.5 !px-5">
+          subscribe &rarr;
+        </button>
+      </form>
+      <div id="newsletter-msg" class="mt-3 text-[11px] font-mono text-text-muted" aria-live="polite" aria-atomic="true">Free forever. No credit card required.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    var form = document.getElementById("newsletter-form");
+    var email = document.getElementById("newsletter-email");
+    var submit = document.getElementById("newsletter-submit");
+    var msg = document.getElementById("newsletter-msg");
+    if (!form || !email || !submit || !msg) return;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Check honeypot
+      var honeypot = form.querySelector('input[name="website"]');
+      if (honeypot && honeypot.value) return;
+
+      var val = email.value.trim();
+      if (!val) return;
+      submit.disabled = true;
+      submit.textContent = "subscribing...";
+      msg.textContent = "One moment...";
+      msg.style.color = "";
+
+      // Subscribe via Supabase API
+      fetch("/api/subscribers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: val })
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            msg.textContent = data.message || "Subscribed! Welcome aboard.";
+            msg.style.color = "var(--color-tag-seo)";
+            email.value = "";
+          } else {
+            msg.textContent = data.error || "Something went wrong. Try again.";
+            msg.style.color = "var(--color-tag-analytics)";
+          }
+          submit.disabled = false;
+          submit.textContent = "subscribe \u2192";
+        })
+        .catch(() => {
+          msg.textContent = "Network error. Try again.";
+          msg.style.color = "var(--color-tag-analytics)";
+          submit.disabled = false;
+          submit.textContent = "subscribe \u2192";
+        });
+    });
+  });
+</script>

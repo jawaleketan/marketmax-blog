@@ -1,0 +1,222 @@
+---
+import "../styles/global.css";
+import SearchOverlay from "../components/SearchOverlay.astro";
+import ClientRouter from "astro/components/ClientRouter.astro";
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const { title, description, image } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MarketMax" />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <title>{title} | MarketMax</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://buttondown.com" />
+    <link rel="preconnect" href="https://pagefind.app" />
+    <ClientRouter fallback="animate" />
+
+    <script>
+      (function() {
+        const saved = localStorage.getItem("theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const theme = saved || (prefersLight ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+
+    <script type="application/ld+json" set:html={`
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://marketmax-blog.netlify.app/#website",
+            "url": "https://marketmax-blog.netlify.app",
+            "name": "MarketMax, Free Digital Marketing Insights",
+            "description": "${description}",
+            "inLanguage": "en-US",
+            "publisher": {
+              "@type": "Person",
+              "@id": "https://marketmax-blog.netlify.app/#person",
+              "name": "Ketan Jawale"
+            }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://marketmax-blog.netlify.app/#person",
+            "name": "Ketan Jawale",
+            "description": "Digital Marketing Enthusiast sharing free insights on SEO, Social Media, Content Marketing, PPC, and Analytics.",
+            "url": "https://marketmax-blog.netlify.app/about"
+          },
+          {
+            "@type": "Blog",
+            "@id": "https://marketmax-blog.netlify.app/#blog",
+            "url": "https://marketmax-blog.netlify.app",
+            "name": "MarketMax Blog",
+            "description": "${description}",
+            "isPartOf": {
+              "@id": "https://marketmax-blog.netlify.app/#website"
+            },
+            "author": {
+              "@id": "https://marketmax-blog.netlify.app/#person"
+            }
+          }
+        ]
+      }
+    `} />
+  </head>
+  <body class="bg-bg-base text-text-primary antialiased">
+    <div id="progress-bar"></div>
+    <slot />
+    <SearchOverlay />
+    <button id="scroll-top-btn" aria-label="Scroll to top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+    </button>
+
+    <script>
+      let isScrollListenerAttached = false;
+
+      document.addEventListener("astro:page-load", () => {
+        const bar = document.getElementById("progress-bar");
+        const btn = document.getElementById("scroll-top-btn");
+
+        // Define a scroll handler that uses the latest active elements
+        window.__updateScrollState = () => {
+          const scrollTop = window.scrollY;
+          if (bar) {
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            if (docHeight <= 0) {
+              bar.style.width = "0%";
+              bar.style.opacity = "0";
+            } else {
+              bar.style.opacity = "1";
+              bar.style.width = Math.min((scrollTop / docHeight) * 100, 100) + "%";
+            }
+          }
+
+          if (btn) {
+            if (scrollTop > 400) btn.classList.add("visible");
+            else btn.classList.remove("visible");
+          }
+        };
+
+        // Attach scroll listener once
+        if (!isScrollListenerAttached) {
+          let ticking = false;
+          window.addEventListener("scroll", () => {
+            if (!ticking) {
+              requestAnimationFrame(() => {
+                if (window.__updateScrollState) window.__updateScrollState();
+                ticking = false;
+              });
+              ticking = true;
+            }
+          });
+          isScrollListenerAttached = true;
+        }
+
+        // Run immediately on page load to initialize state
+        if (window.__updateScrollState) window.__updateScrollState();
+
+        // Mark body as JS-loaded for enhancement-only animations
+        document.body.classList.add("js-loaded");
+
+        // Scroll reveal observer — skip if user prefers reduced motion
+        var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var revealElements = document.querySelectorAll(".reveal");
+        if (!prefersReducedMotion && revealElements.length > 0 && "IntersectionObserver" in window) {
+          var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+          revealElements.forEach(function(el) { revealObserver.observe(el); });
+        } else if (prefersReducedMotion) {
+          revealElements.forEach(function(el) { el.classList.add("visible"); });
+        }
+
+        if (btn) {
+          btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+        }
+
+        window.__themeToggle = function() {
+          const html = document.documentElement;
+          const current = html.getAttribute("data-theme");
+          const next = current === "dark" ? "light" : "dark";
+          html.setAttribute("data-theme", next);
+          localStorage.setItem("theme", next);
+        };
+
+        // Code copy button setup for the new DOM
+        const pres = document.querySelectorAll(".prose pre");
+        pres.forEach(function(pre) {
+          // Prevent adding multiple wrappers if already wrapped
+          if (pre.parentNode && (pre.parentNode as HTMLElement).classList.contains("code-block-wrapper")) {
+            return;
+          }
+
+          const wrapper = document.createElement("div");
+          wrapper.className = "code-block-wrapper";
+          pre.parentNode.insertBefore(wrapper, pre);
+          wrapper.appendChild(pre);
+
+          const code = pre.querySelector("code");
+          const lang = code ? Array.from(code.classList).find(function(c) { return c.startsWith("language-"); }) : null;
+          if (lang) {
+            const label = document.createElement("span");
+            label.className = "code-lang-label";
+            label.textContent = lang.replace("language-", "");
+            wrapper.appendChild(label);
+          }
+
+          const copyBtn = document.createElement("button");
+          copyBtn.className = "code-copy-btn";
+          copyBtn.setAttribute("aria-label", "Copy code");
+          copyBtn.innerHTML = '<svg class="code-copy-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+          copyBtn.innerHTML += '<span class="code-copy-label">Copy</span>';
+          wrapper.appendChild(copyBtn);
+
+          copyBtn.addEventListener("click", function() {
+            const c = pre.querySelector("code");
+            const text = c ? c.textContent || "" : pre.textContent || "";
+            navigator.clipboard.writeText(text).then(function() {
+              copyBtn.classList.add("copied");
+              const labelEl = copyBtn.querySelector(".code-copy-label");
+              if (labelEl) labelEl.textContent = "Copied!";
+              setTimeout(function() {
+                copyBtn.classList.remove("copied");
+                if (labelEl) labelEl.textContent = "Copy";
+              }, 2000);
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

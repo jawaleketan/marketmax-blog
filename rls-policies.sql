@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Newsletter from "../components/Newsletter.astro";
+import Breadcrumb from "../components/Breadcrumb.astro";
+---
+
+<BaseLayout title="About Ketan Jawale, MarketMax" description="Learn more about Ketan Jawale, the founder of MarketMax, a free digital marketing blog.">
+  <Header />
+  <main class="container-article pt-24 pb-20 sm:pt-28 sm:pb-24 animate-fade-in-up">
+    <div class="mb-10"><Breadcrumb items={[{ label: "about" }]} /></div>
+    <div class="flex items-center gap-2 mb-6">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-primary"></span>
+      <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">About</h2>
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] mb-8">Ketan Jawale</h1>
+
+    <div class="flex items-center gap-5 mb-10 p-5 rounded-2xl bg-bg-card border border-border-default">
+      <div class="relative shrink-0">
+        <img src="/images/ketan.jpg" alt="Ketan Jawale" width="120" height="120" class="w-28 h-28 rounded-full object-cover border border-border-default" loading="lazy" decoding="async" />
+        <a href="https://www.linkedin.com/in/ketanjawale/" target="_blank" rel="noopener noreferrer" class="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-accent-primary text-black flex items-center justify-center hover:bg-accent-hover transition-colors duration-200" aria-label="LinkedIn">
+          <svg class="w-2.5 h-2.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+      </div>
+      <div>
+        <p class="text-base font-semibold text-text-primary">Ketan Jawale</p>
+        <p class="text-xs font-mono text-text-muted mt-0.5">Digital Marketing Enthusiast & Educator</p>
+      </div>
+    </div>
+
+    <div class="prose">
+      <p>Welcome to <strong>MarketMax</strong>, your free resource for practical digital marketing knowledge. I'm Ketan Jawale, and I created this blog to share what I've learned about marketing in the digital age.</p>
+      <h2>Why MarketMax?</h2>
+      <p>The internet is full of overpriced courses and jargon-filled guides. MarketMax is my attempt to cut through the noise and deliver actionable, easy-to-understand marketing insights, completely free.</p>
+      <h2>What I Cover</h2>
+      <ul>
+        <li><strong>SEO</strong>: Technical SEO, keyword research, link building</li>
+        <li><strong>Social Media</strong>: Platform strategies, content creation</li>
+        <li><strong>Content Marketing</strong>: Copywriting, storytelling, distribution</li>
+        <li><strong>PPC</strong>: Google Ads, budget optimization</li>
+        <li><strong>Analytics</strong>: Data-driven decisions, reporting</li>
+      </ul>
+      <h2>My Philosophy</h2>
+      <p>Marketing should be accessible to everyone. Whether you're a small business owner, a freelancer, or someone just starting, you shouldn't have to pay a fortune to learn what works.</p>
+    </div>
+
+    <div class="mt-16"><Newsletter /></div>
+  </main>
+  <Footer />
+</BaseLayout>
