@@ -20,9 +20,9 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
 
     {featuredPost && (
       <section class="container-blog mb-14 animate-fade-in-up">
-        <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+        <div class="flex items-center gap-4 my-8 text-text-muted font-mono tracking-wider text-xs uppercase">
           <span>--- [ FEATURED ]</span>
-          <div class="flex-grow border-t border-dashed border-zinc-800"></div>
+          <div class="flex-grow border-t border-dashed border-border-default"></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />

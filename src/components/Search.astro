@@ -5,9 +5,9 @@
     <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-muted pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
     </svg>
-    <input id="search-input" type="text" placeholder="$ search articles..." class="w-full pl-9 pr-4 py-2.5 rounded-md bg-bg-card border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all duration-150 text-xs font-mono" />
+    <input id="search-input" type="text" placeholder="$ search articles..." class="w-full pl-9 pr-4 py-2.5 rounded-md bg-bg-card border border-border-default text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all duration-150 text-xs font-mono" aria-autocomplete="list" aria-controls="search-results" />
   </div>
-  <div id="search-results" class="hidden mt-2"></div>
+  <div id="search-results" class="hidden mt-2" role="listbox" aria-live="polite" aria-atomic="true"></div>
 </div>
 
 <script>

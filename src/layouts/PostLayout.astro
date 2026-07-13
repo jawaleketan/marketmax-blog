@@ -70,11 +70,11 @@ const relatedPosts = allPosts
   `} />
   <Header />
   <main class="container-article pt-4 pb-16 sm:pt-8 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
-    <Breadcrumb items={[
+    <div class="mb-8"><Breadcrumb items={[
       { href: "/blog", label: "blog" },
       { href: `/categories/${post.data.category}`, label: post.data.category.replace("-", " ") },
       { label: post.data.title },
-    ]} />
+    ]} /></div>
 
     <div class="flex items-center gap-3 mb-5">
       <a
@@ -165,7 +165,7 @@ const relatedPosts = allPosts
           </div>
         </div>
       </div>
-      <div class="hidden sm:flex flex-col gap-2">
+      <div class="flex sm:flex-col gap-2">
         <span class="text-[10px] font-mono uppercase tracking-widest text-text-muted text-center">Share</span>
         <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.data.title)}&url=${encodeURIComponent(`https://marketmax-blog.netlify.app/blog/${post.id}`)}`} target="_blank" rel="noopener noreferrer" class="w-9 h-9 flex items-center justify-center rounded-md border border-border-default text-text-muted hover:text-accent-primary hover:border-accent-primary/30 transition-all" aria-label="Share on Twitter">
           <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v12H4z"/><polyline points="22,6 12,13 2,6"/></svg>
@@ -181,19 +181,22 @@ const relatedPosts = allPosts
     </div>
 
     {(prevPost || nextPost) && (
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-        {prevPost ? (
-          <a href={`/blog/${prevPost.id}`} class="card-hover group p-4 rounded-lg border border-border-default bg-bg-card hover:bg-bg-hover">
-            <span class="text-[10px] font-mono text-text-muted">&larr; Previous</span>
-            <p class="text-sm font-medium text-text-primary group-hover:text-accent-primary transition-colors mt-1 leading-snug">{prevPost.data.title}</p>
-          </a>
-        ) : <div></div>}
-        {nextPost ? (
-          <a href={`/blog/${nextPost.id}`} class="card-hover group p-4 rounded-lg border border-border-default bg-bg-card hover:bg-bg-hover text-right">
-            <span class="text-[10px] font-mono text-text-muted">Next &rarr;</span>
-            <p class="text-sm font-medium text-text-primary group-hover:text-accent-primary transition-colors mt-1 leading-snug">{nextPost.data.title}</p>
-          </a>
-        ) : <div></div>}
+      <div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          {prevPost ? (
+            <a href={`/blog/${prevPost.id}`} class="card-hover group p-4 rounded-lg border border-border-default bg-bg-card hover:bg-bg-hover">
+              <span class="text-[10px] font-mono text-text-muted">&larr; Previous</span>
+              <p class="text-sm font-medium text-text-primary group-hover:text-accent-primary transition-colors mt-1 leading-snug">{prevPost.data.title}</p>
+            </a>
+          ) : <div></div>}
+          {nextPost ? (
+            <a href={`/blog/${nextPost.id}`} class="card-hover group p-4 rounded-lg border border-border-default bg-bg-card hover:bg-bg-hover text-right">
+              <span class="text-[10px] font-mono text-text-muted">Next &rarr;</span>
+              <p class="text-sm font-medium text-text-primary group-hover:text-accent-primary transition-colors mt-1 leading-snug">{nextPost.data.title}</p>
+            </a>
+          ) : <div></div>}
+        </div>
+        <p class="text-center text-[10px] font-mono text-text-muted"><kbd class="px-1.5 py-0.5 rounded border border-border-default text-[10px]">j</kbd> prev &middot; <kbd class="px-1.5 py-0.5 rounded border border-border-default text-[10px]">k</kbd> next</p>
       </div>
     )}
 

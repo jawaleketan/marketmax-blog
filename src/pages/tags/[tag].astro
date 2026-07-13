@@ -5,9 +5,9 @@ import Footer from "../../components/Footer.astro";
 import BlogCard from "../../components/BlogCard.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import { getCollection } from "astro:content";
+import { slugify } from "../../lib/constants";
 
 export async function getStaticPaths() {
-  function slugify(s) { return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""); }
   const allPosts = await getCollection("blog");
   const tagMap = new Map<string, string>();
   allPosts.forEach((p) => p.data.tags.forEach((t) => {
@@ -19,7 +19,6 @@ export async function getStaticPaths() {
 
 const { tag, original } = Astro.props as { tag: string; original: string };
 
-function slugify(s: string) { return s.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, ""); }
 const allPosts = await getCollection("blog");
 const filteredPosts = allPosts
   .filter((p) => p.data.tags.some((t) => slugify(t) === tag))
@@ -29,7 +28,7 @@ const filteredPosts = allPosts
 <BaseLayout title={`#${tag} — MarketMax`} description={`Articles tagged with #${tag}.`}>
   <Header />
   <main class="animate-fade-in-up">
-    <div class="container-blog pt-2 sm:pt-4">
+    <div class="container-blog pt-2 pb-8 sm:pt-4 sm:pb-10">
       <Breadcrumb items={[
         { href: "/blog", label: "blog" },
         { label: `#${tag}` },
