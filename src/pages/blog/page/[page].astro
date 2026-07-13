@@ -28,9 +28,9 @@ const { pageNum, totalPages, sortedPosts } = Astro.props as {
 const pagePosts = sortedPosts.slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SIZE);
 ---
 
-<BaseLayout title={`Articles — Page ${pageNum} — MarketMax`} description="Browse all free digital marketing articles by Ketan Jawale.">
+<BaseLayout title={`Articles, Page ${pageNum}, MarketMax`} description="Browse all free digital marketing articles by Ketan Jawale.">
   <Header />
-  <main class="container-blog pt-4 pb-16 sm:pt-8 sm:pb-20 animate-fade-in-up">
+  <main class="container-blog pt-10 pb-16 sm:pt-14 sm:pb-20 animate-fade-in-up">
     <div class="mb-8"><Breadcrumb items={[
       { href: "/blog", label: "all-articles" },
       { label: `page ${pageNum}` },
@@ -40,7 +40,7 @@ const pagePosts = sortedPosts.slice((pageNum - 1) * PAGE_SIZE, pageNum * PAGE_SI
       <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Articles</h2>
     </div>
     <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">All Articles</h1>
-    <p class="text-sm font-mono text-text-secondary mb-8">Free digital marketing insights — from SEO to analytics. <span class="text-text-muted">({sortedPosts.length} posts)</span></p>
+    <p class="text-sm font-mono text-text-secondary mb-8">Free digital marketing insights, from SEO to analytics. <span class="text-text-muted">({sortedPosts.length} posts)</span></p>
     <div class="mb-12"><Search /></div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
       {pagePosts.map((post) => <BlogCard post={post} />)}

@@ -5,7 +5,7 @@ export async function GET(context) {
   const posts = await getCollection("blog");
   const sorted = posts.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
   return rss({
-    title: "MarketMax — Digital Marketing Blog",
+    title: "MarketMax, Digital Marketing Blog",
     description: "Free digital marketing insights by Ketan Jawale.",
     site: context.site,
     items: sorted.map((post) => ({

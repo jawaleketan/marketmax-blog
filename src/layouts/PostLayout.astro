@@ -69,7 +69,7 @@ const relatedPosts = allPosts
     }
   `} />
   <Header />
-  <main class="container-article pt-4 pb-16 sm:pt-8 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
+  <main class="container-article pt-10 pb-16 sm:pt-14 sm:pb-20 animate-fade-in-up" data-post-slug={post.id} data-prev-url={prevPost ? `/blog/${prevPost.id}` : ""} data-next-url={nextPost ? `/blog/${nextPost.id}` : ""}>
     <div class="mb-8"><Breadcrumb items={[
       { href: "/blog", label: "blog" },
       { href: `/categories/${post.data.category}`, label: post.data.category.replace("-", " ") },

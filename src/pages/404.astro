@@ -10,9 +10,9 @@ const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.dat
 const latestPosts = sortedPosts.slice(0, 3);
 ---
 
-<BaseLayout title="404 — Not Found" description="Page not found.">
+<BaseLayout title="404, Not Found" description="Page not found.">
   <Header />
-  <main class="container-blog pt-8 pb-20 animate-fade-in-up">
+  <main class="container-blog pt-14 pb-20 animate-fade-in-up">
     <div class="max-w-lg mx-auto text-center">
       <div class="inline-flex items-center gap-3 mb-8">
         <span class="text-6xl font-mono font-bold text-accent-primary">404</span>

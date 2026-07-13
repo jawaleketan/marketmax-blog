@@ -13,17 +13,13 @@ const featuredPost = sortedPosts.find((p) => p.data.featured) || sortedPosts[0];
 const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
 ---
 
-<BaseLayout title="MarketMax — Digital Marketing Insights" description="Digital marketing blog by Ketan Jawale. Learn SEO, social media, content marketing, PPC, and analytics with actionable guides.">
+<BaseLayout title="MarketMax, Digital Marketing Insights" description="Digital marketing blog by Ketan Jawale. Learn SEO, social media, content marketing, PPC, and analytics with actionable guides.">
   <Header />
   <main>
     <Hero />
 
     {featuredPost && (
       <section class="container-blog mb-14 animate-fade-in-up">
-        <div class="flex items-center gap-4 my-8 text-text-muted font-mono tracking-wider text-xs uppercase">
-          <span>--- [ FEATURED ]</span>
-          <div class="flex-grow border-t border-dashed border-border-default"></div>
-        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           <BlogCard post={featuredPost} featured={true} />
         </div>
@@ -31,10 +27,6 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     )}
 
     <section class="container-blog mb-14 animate-fade-in-up">
-      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
-        <span>--- [ CATEGORIES ]</span>
-        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
-      </div>
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
           const count = allPosts.filter((p) => p.data.category === cat).length;
@@ -78,10 +70,6 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     </section>
 
     <section class="container-blog pb-20 animate-fade-in-up">
-      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
-        <span>--- [ STAY UPDATED ]</span>
-        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
-      </div>
       <Newsletter />
     </section>
   </main>

@@ -25,10 +25,10 @@ const filteredPosts = allPosts
   .sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
 ---
 
-<BaseLayout title={`#${tag} — MarketMax`} description={`Articles tagged with #${tag}.`}>
+<BaseLayout title={`#${tag}, MarketMax`} description={`Articles tagged with #${tag}.`}>
   <Header />
   <main class="animate-fade-in-up">
-    <div class="container-blog pt-2 pb-8 sm:pt-4 sm:pb-10">
+    <div class="container-blog pt-6 pb-8 sm:pt-10 sm:pb-10">
       <Breadcrumb items={[
         { href: "/blog", label: "blog" },
         { label: `#${tag}` },
