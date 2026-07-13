@@ -28,28 +28,28 @@ const filteredPosts = allPosts
 <BaseLayout title={`#${tag}, MarketMax`} description={`Articles tagged with #${tag}.`}>
   <Header />
   <main class="animate-fade-in-up">
-    <div class="container-blog pt-16 pb-10 sm:pt-24 sm:pb-12">
+    <div class="container-blog pt-24 pb-10 sm:pt-28 sm:pb-12">
       <Breadcrumb items={[
         { href: "/blog", label: "blog" },
         { label: `#${tag}` },
       ]} />
     </div>
     <div class="border-b border-border-default">
-      <div class="container-blog pt-6 pb-16 sm:pt-8 sm:pb-20">
+      <div class="container-blog pt-6 pb-20 sm:pt-8 sm:pb-24">
         <div class="flex items-center gap-3 mb-4">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-wider border border-accent-primary/25 text-accent-primary bg-accent-subtle">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border border-accent-primary/20 text-accent-primary bg-accent-subtle">
             <span class="w-1 h-1 rounded-full bg-current"></span>
             #{original}
           </span>
         </div>
-        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-3">#{original}</h1>
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] mb-3">#{original}</h1>
         <p class="text-sm font-mono text-text-secondary">
           Articles tagged with <span class="text-accent-primary">#{original}</span>
           <span class="text-text-muted"> ({filteredPosts.length} post{filteredPosts.length !== 1 ? "s" : ""})</span>
         </p>
       </div>
     </div>
-    <div class="container-blog pb-16 pt-10 sm:pb-20 sm:pt-12">
+    <div class="container-blog pb-20 pt-10 sm:pb-24 sm:pt-12">
     {filteredPosts.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredPosts.map((post) => <BlogCard post={post} />)}

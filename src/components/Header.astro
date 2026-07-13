@@ -13,38 +13,38 @@ const navLinks = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="sticky top-0 z-50 bg-bg-base/85 backdrop-blur-lg border-b border-border-default">
-  <div class="header-inner container-blog flex items-center justify-between h-14">
-    <a href="/" class="flex items-center gap-2 text-sm text-text-primary hover:text-accent-primary transition-colors duration-150">
-      <span class="text-accent-primary font-bold font-mono">&gt;</span>
-      <span class="font-semibold tracking-tight">marketmax</span>
-      <span class="text-text-muted font-mono">~$</span>
+<header class="floating-nav" id="main-header">
+  <div class="header-inner flex items-center justify-between h-12">
+    <a href="/" class="flex items-center gap-2 text-sm text-text-primary hover:text-accent-primary transition-colors duration-200">
+      <span class="text-accent-primary font-bold font-mono text-xs">&gt;</span>
+      <span class="font-semibold tracking-tight text-sm">marketmax</span>
+      <span class="text-text-muted font-mono text-xs">~$</span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-1">
+    <nav class="hidden md:flex items-center gap-0.5">
       {navLinks.map((link) => {
         const isActive = link.href === "/" ? currentPath === "/" : currentPath.startsWith(link.href);
         return (
-          <a href={link.href} class={`px-3 py-1.5 rounded-md text-xs font-mono transition-all duration-150 ${isActive ? "text-accent-primary bg-accent-subtle" : "text-text-muted hover:text-text-primary hover:bg-bg-card"}`}>
+          <a href={link.href} class={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-200 ${isActive ? "text-accent-primary bg-accent-subtle" : "text-text-muted hover:text-text-primary hover:bg-bg-card/50"}`}>
             {isActive ? `> ${link.label.toLowerCase()}` : link.label.toLowerCase()}
           </a>
         );
       })}
     </nav>
 
-    <div class="flex items-center gap-1">
-      <button onclick="window.__openSearch()" class="hidden sm:flex w-8 h-8 items-center justify-center rounded-md text-text-muted hover:text-accent-primary hover:bg-bg-card transition-all" aria-label="Search articles (Ctrl+K)">
+    <div class="flex items-center gap-0.5">
+      <button onclick="window.__openSearch()" class="hidden sm:flex w-8 h-8 items-center justify-center rounded-full text-text-muted hover:text-accent-primary hover:bg-bg-card/50 transition-all duration-200" aria-label="Search articles (Ctrl+K)">
         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
         </svg>
       </button>
-      <button id="theme-toggle" onclick="window.__themeToggle()" class="w-8 h-8 flex items-center justify-center rounded-md text-text-muted hover:text-accent-primary hover:bg-bg-card transition-all" aria-label="Toggle theme">
+      <button id="theme-toggle" onclick="window.__themeToggle()" class="w-8 h-8 flex items-center justify-center rounded-full text-text-muted hover:text-accent-primary hover:bg-bg-card/50 transition-all duration-200" aria-label="Toggle theme">
         <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
         </svg>
       </button>
 
-      <button id="menu-toggle" class="md:hidden text-text-secondary hover:text-text-primary transition-colors relative w-8 h-8 flex items-center justify-center rounded-md hover:bg-bg-card" aria-label="Toggle menu">
+      <button id="menu-toggle" class="md:hidden text-text-secondary hover:text-text-primary transition-colors duration-200 relative w-8 h-8 flex items-center justify-center rounded-full hover:bg-bg-card/50" aria-label="Toggle menu">
         <svg id="menu-icon-open" class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>
         </svg>
@@ -55,12 +55,12 @@ const currentPath = Astro.url.pathname;
     </div>
   </div>
 
-  <div id="mobile-menu" class="md:hidden border-t border-border-default bg-bg-surface">
-    <div class="container-blog flex flex-col gap-1 py-2">
+  <div id="mobile-menu" class="md:hidden border-t border-border-default bg-bg-surface/95 backdrop-blur-xl rounded-2xl mx-2 mb-2">
+    <div class="flex flex-col gap-1 py-2 px-2">
       {navLinks.map((link) => {
         const isActive = link.href === "/" ? currentPath === "/" : currentPath.startsWith(link.href);
         return (
-          <a href={link.href} class={`px-3 py-2 rounded-md text-sm font-mono transition-all ${isActive ? "text-accent-primary bg-accent-subtle" : "text-text-muted hover:text-text-primary hover:bg-bg-card"}`}>
+          <a href={link.href} class={`px-3 py-2 rounded-xl text-sm font-mono transition-all duration-200 ${isActive ? "text-accent-primary bg-accent-subtle" : "text-text-muted hover:text-text-primary hover:bg-bg-card/50"}`}>
             {isActive ? `> ${link.label.toLowerCase()}` : `$ ${link.label.toLowerCase()}`}
           </a>
         );
@@ -120,7 +120,7 @@ const currentPath = Astro.url.pathname;
       if (!toggle.contains(e.target) && !menu.contains(e.target)) closeMenu();
     });
 
-    const header = document.querySelector("header");
+    const header = document.getElementById("main-header");
     if (header) {
       let ticking = false;
       function updateHeader() {

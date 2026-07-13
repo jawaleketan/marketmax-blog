@@ -19,27 +19,27 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     <Hero />
 
     {featuredPost && (
-      <section class="container-blog mb-14 animate-fade-in-up">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+      <section class="container-blog py-20 sm:py-24">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BlogCard post={featuredPost} featured={true} />
         </div>
       </section>
     )}
 
-    <section class="container-blog mb-14 animate-fade-in-up">
+    <section class="container-blog py-20 sm:py-24">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
           const count = allPosts.filter((p) => p.data.category === cat).length;
           const labels = { seo: "SEO", "social-media": "Social", "content-marketing": "Content", ppc: "PPC", analytics: "Analytics" };
           const colors = {
-            seo: "border-tag-seo/25 text-tag-seo bg-tag-seo/5 hover:bg-tag-seo/10",
-            "social-media": "border-tag-social/25 text-tag-social bg-tag-social/5 hover:bg-tag-social/10",
-            "content-marketing": "border-tag-content/25 text-tag-content bg-tag-content/5 hover:bg-tag-content/10",
-            ppc: "border-tag-ppc/25 text-tag-ppc bg-tag-ppc/5 hover:bg-tag-ppc/10",
-            analytics: "border-tag-analytics/25 text-tag-analytics bg-tag-analytics/5 hover:bg-tag-analytics/10",
+            seo: "border-tag-seo/20 text-tag-seo bg-tag-seo/5 hover:bg-tag-seo/10",
+            "social-media": "border-tag-social/20 text-tag-social bg-tag-social/5 hover:bg-tag-social/10",
+            "content-marketing": "border-tag-content/20 text-tag-content bg-tag-content/5 hover:bg-tag-content/10",
+            ppc: "border-tag-ppc/20 text-tag-ppc bg-tag-ppc/5 hover:bg-tag-ppc/10",
+            analytics: "border-tag-analytics/20 text-tag-analytics bg-tag-analytics/5 hover:bg-tag-analytics/10",
           };
           return (
-            <a href={`/categories/${cat}`} class={`card-hover flex flex-col items-center gap-2 p-5 rounded-lg border ${colors[cat]}`}>
+            <a href={`/categories/${cat}`} class={`card-hover flex flex-col items-center gap-2 p-5 rounded-2xl border ${colors[cat]}`}>
               <span class="text-lg font-bold">{labels[cat]}</span>
               <span class="text-[11px] font-mono opacity-70">{count} post{count !== 1 ? "s" : ""}</span>
             </a>
@@ -48,18 +48,16 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       </div>
     </section>
 
-    <section class="container-blog mb-20 animate-fade-in-up">
-      <div class="flex items-center gap-4 my-8 text-zinc-600 font-mono tracking-wider text-xs uppercase">
+    <section class="container-blog py-20 sm:py-24">
+      <div class="flex items-center gap-4 mb-10 text-text-muted font-mono tracking-wider text-xs uppercase">
         <span>--- [ LATEST ]</span>
-        <div class="flex-grow border-t border-dashed border-zinc-800"></div>
-        <a href="/blog" class="whitespace-nowrap hover:text-accent-primary transition-colors">view all &rarr;</a>
+        <div class="flex-grow border-t border-dashed border-border-default"></div>
+        <a href="/blog" class="whitespace-nowrap hover:text-accent-primary transition-colors duration-200">view all &rarr;</a>
       </div>
       {recentPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {recentPosts.map((post, i) => (
-            <div class={`animate-fade-in-up delay-${Math.min(i + 1, 6)}`}>
-              <BlogCard post={post} />
-            </div>
+          {recentPosts.map((post) => (
+            <BlogCard post={post} />
           ))}
         </div>
       ) : (
@@ -69,7 +67,7 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
       )}
     </section>
 
-    <section class="container-blog pb-20 animate-fade-in-up">
+    <section class="container-blog py-20 sm:py-24">
       <Newsletter />
     </section>
   </main>

@@ -31,6 +31,9 @@ const { title, description, image } = Astro.props;
     <meta name="twitter:description" content={description} />
 
     <title>{title} | MarketMax</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="preconnect" href="https://buttondown.com" />
     <link rel="preconnect" href="https://pagefind.app" />
     <ClientRouter fallback="animate" />
@@ -137,6 +140,26 @@ const { title, description, image } = Astro.props;
 
         // Run immediately on page load to initialize state
         if (window.__updateScrollState) window.__updateScrollState();
+
+        // Mark body as JS-loaded for enhancement-only animations
+        document.body.classList.add("js-loaded");
+
+        // Scroll reveal observer — skip if user prefers reduced motion
+        var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var revealElements = document.querySelectorAll(".reveal");
+        if (!prefersReducedMotion && revealElements.length > 0 && "IntersectionObserver" in window) {
+          var revealObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                revealObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.1, rootMargin: "0px 0px -40px 0px" });
+          revealElements.forEach(function(el) { revealObserver.observe(el); });
+        } else if (prefersReducedMotion) {
+          revealElements.forEach(function(el) { el.classList.add("visible"); });
+        }
 
         if (btn) {
           btn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));

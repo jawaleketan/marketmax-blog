@@ -8,26 +8,26 @@ const { post, featured = false } = Astro.props;
 type Category = "seo" | "social-media" | "content-marketing" | "ppc" | "analytics";
 
 const categoryStyles: Record<Category, { tag: string; label: string }> = {
-  seo: { tag: "bg-tag-seo/5 text-tag-seo border-tag-seo/25", label: "SEO" },
-  "social-media": { tag: "bg-tag-social/5 text-tag-social border-tag-social/25", label: "Social" },
-  "content-marketing": { tag: "bg-tag-content/5 text-tag-content border-tag-content/25", label: "Content" },
-  ppc: { tag: "bg-tag-ppc/5 text-tag-ppc border-tag-ppc/25", label: "PPC" },
-  analytics: { tag: "bg-tag-analytics/5 text-tag-analytics border-tag-analytics/25", label: "Analytics" },
+  seo: { tag: "bg-tag-seo/5 text-tag-seo border-tag-seo/20", label: "SEO" },
+  "social-media": { tag: "bg-tag-social/5 text-tag-social border-tag-social/20", label: "Social" },
+  "content-marketing": { tag: "bg-tag-content/5 text-tag-content border-tag-content/20", label: "Content" },
+  ppc: { tag: "bg-tag-ppc/5 text-tag-ppc border-tag-ppc/20", label: "PPC" },
+  analytics: { tag: "bg-tag-analytics/5 text-tag-analytics border-tag-analytics/20", label: "Analytics" },
 };
 
 const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hover text-text-muted border-border-default", label: post.data.category };
 ---
 
-<article class={`card-hover group relative flex flex-col rounded-lg border border-border-default bg-bg-card overflow-hidden ${featured ? "md:col-span-2 lg:col-span-2" : ""}`}>
+<article class={`card-bezel group relative flex flex-col ${featured ? "md:col-span-2 lg:col-span-2" : ""}`}>
   <a href={`/blog/${post.id}`} class="block flex flex-col h-full">
     {post.data.image && (
       <div class="aspect-[16/9] overflow-hidden bg-bg-surface">
-        <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" loading="lazy" decoding="async" />
+        <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]" loading="lazy" decoding="async" />
       </div>
     )}
-    <div class="p-5 sm:p-6 flex flex-col flex-grow">
+    <div class="card-bezel-inner flex flex-col flex-grow">
       <div class="flex items-center gap-2 mb-3">
-        <span class={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider border ${cat.tag}`}>
+        <span class={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider border ${cat.tag}`}>
           <span class="w-1 h-1 rounded-full bg-current"></span>
           {cat.label}
         </span>
@@ -36,7 +36,7 @@ const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hove
         </span>
       </div>
 
-      <h3 class={`font-bold text-text-primary group-hover:text-accent-primary transition-colors duration-150 leading-snug ${featured ? "text-2xl" : "text-base"}`}>
+      <h3 class={`font-bold text-text-primary group-hover:text-accent-primary transition-colors duration-200 leading-snug ${featured ? "text-2xl tracking-tight" : "text-base"}`}>
         {post.data.title}
       </h3>
 
