@@ -93,3 +93,9 @@ export async function signOut(request: Request) {
     await client.auth.admin.signOut(accessToken);
   }
 }
+
+export function clearSessionCookies(): string[] {
+  const expired = "sb-access-token=; Path=/; Max-Age=0; SameSite=Lax";
+  const expiredRefresh = "sb-refresh-token=; Path=/; Max-Age=0; SameSite=Lax";
+  return [expired, expiredRefresh];
+}
