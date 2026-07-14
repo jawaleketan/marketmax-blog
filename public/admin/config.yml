@@ -1,6 +1,9 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: jawaleketan/marketmax-blog
   branch: main
+  auth_type: pkce
+  app_id: Ov23li4sKlr4KyRWpAFL
 
 media_folder: "public/images"
 public_folder: "/images"

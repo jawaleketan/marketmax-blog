@@ -6,7 +6,7 @@ import sitemap from "@astrojs/sitemap";
 import vercel from "@astrojs/vercel";
 
 export default defineConfig({
-  site: "https://marketmax-blog.netlify.app",
+  site: "https://marketmax-blog.vercel.app",
   output: "static",
   adapter: vercel(),
   integrations: [mdx(), sitemap()],

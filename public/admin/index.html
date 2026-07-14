@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MarketMax — Content Manager</title>
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
   <style>
     html { background: #0d0d0f; }
     body { font-family: system-ui, -apple-system, sans-serif; }
@@ -50,16 +50,6 @@
 <body>
   <script src="https://unpkg.com/decap-cms@^3/dist/decap-cms.js"></script>
   <script>
-    if (window.netlifyIdentity) {
-      netlifyIdentity.on("init", function(user) {
-        if (!user) {
-          netlifyIdentity.on("login", function() {
-            document.location.href = "/admin/";
-          });
-        }
-      });
-    }
-
     CMS.registerPreviewStyle("/admin/preview.css", { raw: false });
     CMS.registerPreviewTemplate("blog", function({ entry }) {
       var data = entry.get("data");
