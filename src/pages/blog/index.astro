@@ -6,12 +6,20 @@ import BlogCard from "../../components/BlogCard.astro";
 import Search from "../../components/Search.astro";
 import Breadcrumb from "../../components/Breadcrumb.astro";
 import { getCollection } from "astro:content";
+import { getSupabasePosts } from "../../lib/posts";
 import { PAGE_SIZE } from "../../lib/constants";
 
-const allPosts = await getCollection("blog");
-const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
-const totalPages = Math.ceil(sortedPosts.length / PAGE_SIZE);
-const pagePosts = sortedPosts.slice(0, PAGE_SIZE);
+const [markdownPosts, supabasePosts] = await Promise.all([
+  getCollection("blog"),
+  getSupabasePosts(),
+]);
+
+const allPosts = [...markdownPosts, ...supabasePosts].sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+
+const totalPages = Math.ceil(allPosts.length / PAGE_SIZE);
+const pagePosts = allPosts.slice(0, PAGE_SIZE);
 ---
 
 <BaseLayout title="All Articles, MarketMax" description="Browse all free digital marketing articles by Ketan Jawale.">
@@ -23,7 +31,7 @@ const pagePosts = sortedPosts.slice(0, PAGE_SIZE);
       <h2 class="text-[11px] font-mono font-semibold uppercase tracking-widest text-text-muted">Articles</h2>
     </div>
     <h1 class="text-3xl sm:text-4xl font-extrabold tracking-[-0.03em] mb-3">All Articles</h1>
-    <p class="text-sm font-mono text-text-secondary mb-8">Free digital marketing insights, from SEO to analytics. <span class="text-text-muted">({sortedPosts.length} post{sortedPosts.length !== 1 ? "s" : ""})</span></p>
+    <p class="text-sm font-mono text-text-secondary mb-8">Free digital marketing insights, from SEO to analytics. <span class="text-text-muted">({allPosts.length} post{allPosts.length !== 1 ? "s" : ""})</span></p>
     <div class="mb-12"><Search /></div>
     {pagePosts.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

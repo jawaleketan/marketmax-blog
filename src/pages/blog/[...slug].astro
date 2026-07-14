@@ -1,13 +1,41 @@
 ---
 import PostLayout from "../../layouts/PostLayout.astro";
 import { getCollection } from "astro:content";
+import { getSupabasePostBySlug } from "../../lib/posts";
 
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+export const prerender = false;
+
+const { slug } = Astro.params;
+
+let post = null;
+let source = "markdown";
+
+const allPosts = await getCollection("blog");
+const markdownPost = allPosts.find((p) => p.id === slug);
+
+if (markdownPost) {
+  post = markdownPost;
+  source = "markdown";
+} else {
+  const supabasePost = await getSupabasePostBySlug(slug);
+  if (supabasePost) {
+    post = supabasePost;
+    source = "supabase";
+  }
 }
 
-const { post } = Astro.props;
+if (!post) {
+  return Astro.redirect("/404");
+}
 ---
 
-<PostLayout post={post} />
+{source === "markdown" ? (
+  <PostLayout post={post} />
+) : (
+  <PostLayout post={{
+    id: post.slug,
+    slug: post.slug,
+    body: post.body,
+    data: post.data,
+  }} />
+)}

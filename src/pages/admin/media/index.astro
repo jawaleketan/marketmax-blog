@@ -1,0 +1,109 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { getSupabaseServerClient } from "../../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = getSupabaseServerClient();
+
+const { data: media } = await supabase
+  .from("media")
+  .select("*")
+  .order("created_at", { ascending: false });
+---
+
+<AdminLayout title="Media">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0;letter-spacing:-0.03em;">Media Library</h1>
+    <label style="padding:8px 16px;border-radius:8px;background:var(--color-accent-primary);color:#000;font-size:13px;font-weight:600;cursor:pointer;display:inline-block;">
+      Upload Image
+      <input type="file" accept="image/*" id="upload-input" style="display:none;" />
+    </label>
+  </div>
+
+  <div id="upload-status" style="display:none;margin-bottom:16px;padding:10px 14px;border-radius:8px;font-size:13px;"></div>
+
+  {media && media.length > 0 ? (
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;">
+      {media.map((item) => (
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:8px;overflow:hidden;position:group;" id={`media-${item.id}`}>
+          <div style="aspect-ratio:1;overflow:hidden;background:var(--color-bg-surface);display:flex;align-items:center;justify-content:center;">
+            <img src={item.url} alt={item.alt_text || item.filename} style="width:100%;height:100%;object-fit:cover;" />
+          </div>
+          <div style="padding:8px 10px;">
+            <div style="font-size:11px;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title={item.filename}>
+              {item.filename}
+            </div>
+            <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">
+              {item.file_size ? `${(item.file_size / 1024).toFixed(0)} KB` : ""}
+            </div>
+            <div style="display:flex;gap:4px;margin-top:6px;">
+              <button onclick={`copyUrl('${item.url}')`} style="flex:1;padding:4px;border-radius:4px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-muted);font-size:10px;cursor:pointer;font-family:inherit;">Copy URL</button>
+              <button onclick={`deleteMedia('${item.id}')`} style="padding:4px 6px;border-radius:4px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);color:#ef4444;font-size:10px;cursor:pointer;font-family:inherit;">✕</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:40px;text-align:center;">
+      <p style="font-size:14px;color:var(--color-text-muted);margin:0;">No media uploaded yet</p>
+    </div>
+  )}
+
+  <script>
+    const uploadInput = document.getElementById("upload-input");
+    const uploadStatus = document.getElementById("upload-status");
+
+    uploadInput.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      uploadStatus.style.display = "block";
+      uploadStatus.style.background = "var(--color-accent-subtle)";
+      uploadStatus.style.color = "var(--color-accent-primary)";
+      uploadStatus.textContent = "Uploading...";
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const res = await fetch("/api/admin/media/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          uploadStatus.style.background = "rgba(239,68,68,0.1)";
+          uploadStatus.style.color = "#ef4444";
+          uploadStatus.textContent = data.error || "Upload failed";
+          return;
+        }
+
+        uploadStatus.style.background = "rgba(16,185,129,0.1)";
+        uploadStatus.style.color = "#10b981";
+        uploadStatus.textContent = "Uploaded! Refreshing...";
+        setTimeout(() => window.location.reload(), 1000);
+      } catch (err) {
+        uploadStatus.style.background = "rgba(239,68,68,0.1)";
+        uploadStatus.style.color = "#ef4444";
+        uploadStatus.textContent = "Network error";
+      }
+    });
+
+    function copyUrl(url) {
+      navigator.clipboard.writeText(url);
+      const btn = event.target;
+      btn.textContent = "Copied!";
+      setTimeout(() => { btn.textContent = "Copy URL"; }, 1500);
+    }
+
+    async function deleteMedia(id) {
+      if (!confirm("Delete this media file?")) return;
+      await fetch(`/api/admin/media/${id}`, { method: "DELETE" });
+      window.location.reload();
+    }
+  </script>
+</AdminLayout>

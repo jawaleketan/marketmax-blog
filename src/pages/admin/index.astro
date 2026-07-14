@@ -1,0 +1,121 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+import { getSupabaseServerClient } from "../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = getSupabaseServerClient();
+
+const [postsResult, commentsResult, subscribersResult, pendingResult] = await Promise.all([
+  supabase.from("posts").select("id", { count: "exact", head: true }),
+  supabase.from("comments").select("id", { count: "exact", head: true }),
+  supabase.from("subscribers").select("id", { count: "exact", head: true }),
+  supabase.from("comments").select("id", { count: "exact", head: true }).eq("approved", false),
+]);
+
+const totalPosts = postsResult.count || 0;
+const totalComments = commentsResult.count || 0;
+const totalSubscribers = subscribersResult.count || 0;
+const pendingComments = pendingResult.count || 0;
+
+const { data: recentPosts } = await supabase
+  .from("posts")
+  .select("id, title, slug, status, category, created_at")
+  .order("created_at", { ascending: false })
+  .limit(5);
+
+const { data: pendingCommentsList } = await supabase
+  .from("comments")
+  .select("id, author_name, body, slug, created_at")
+  .eq("approved", false)
+  .order("created_at", { ascending: false })
+  .limit(5);
+
+const categoryColors: Record<string, string> = {
+  "seo": "var(--color-tag-seo)",
+  "social-media": "var(--color-tag-social)",
+  "content-marketing": "var(--color-tag-content)",
+  "ppc": "var(--color-tag-ppc)",
+  "analytics": "var(--color-tag-analytics)",
+};
+---
+
+<AdminLayout title="Dashboard">
+  <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0 0 24px;letter-spacing:-0.03em;">Dashboard</h1>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px;">
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:20px;">
+      <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;">Total Posts</div>
+      <div style="font-size:28px;font-weight:800;color:var(--color-text-primary);font-family:monospace;">{totalPosts}</div>
+      <a href="/admin/posts/new" style="font-size:12px;color:var(--color-accent-primary);text-decoration:none;margin-top:8px;display:inline-block;">+ New Post</a>
+    </div>
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:20px;">
+      <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;">Comments</div>
+      <div style="font-size:28px;font-weight:800;color:var(--color-text-primary);font-family:monospace;">{totalComments}</div>
+      {pendingComments > 0 && (
+        <a href="/admin/comments" style="font-size:12px;color:#ef4444;text-decoration:none;margin-top:8px;display:inline-block;">{pendingComments} pending</a>
+      )}
+    </div>
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:20px;">
+      <div style="font-size:12px;color:var(--color-text-muted);margin-bottom:8px;">Subscribers</div>
+      <div style="font-size:28px;font-weight:800;color:var(--color-text-primary);font-family:monospace;">{totalSubscribers}</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+    <div>
+      <h2 style="font-size:14px;font-weight:700;color:var(--color-text-primary);margin:0 0 12px;">Recent Posts</h2>
+      {recentPosts && recentPosts.length > 0 ? (
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;overflow:hidden;">
+          {recentPosts.map((post) => (
+            <div style="padding:12px 16px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+              <div style="flex:1;min-width:0;">
+                <a href={`/admin/posts/${post.id}/edit`} style="font-size:13px;font-weight:600;color:var(--color-text-primary);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">
+                  {post.title}
+                </a>
+                <div style="display:flex;gap:8px;margin-top:4px;align-items:center;">
+                  <span style={`font-size:10px;padding:2px 6px;border-radius:4px;background:${categoryColors[post.category] || "var(--color-text-muted)"}22;color:${categoryColors[post.category] || "var(--color-text-muted)"};font-weight:600;`}>
+                    {post.category}
+                  </span>
+                  <span style={`font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;${post.status === "published" ? "background:rgba(16,185,129,0.1);color:#10b981;" : "background:rgba(245,158,11,0.1);color:#f59e0b;"}`}>
+                    {post.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:24px;text-align:center;">
+          <p style="font-size:13px;color:var(--color-text-muted);margin:0;">No posts yet. <a href="/admin/posts/new" style="color:var(--color-accent-primary);">Create your first post</a></p>
+        </div>
+      )}
+    </div>
+
+    <div>
+      <h2 style="font-size:14px;font-weight:700;color:var(--color-text-primary);margin:0 0 12px;">Pending Comments</h2>
+      {pendingCommentsList && pendingCommentsList.length > 0 ? (
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;overflow:hidden;">
+          {pendingCommentsList.map((comment) => (
+            <div style="padding:12px 16px;border-bottom:1px solid var(--color-border-default);">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <span style="font-size:12px;font-weight:600;color:var(--color-text-primary);">{comment.author_name}</span>
+                <span style="font-size:10px;color:var(--color-text-muted);">on {comment.slug}</span>
+              </div>
+              <p style="font-size:12px;color:var(--color-text-secondary);margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                {comment.body}
+              </p>
+            </div>
+          ))}
+          <a href="/admin/comments" style="display:block;padding:10px 16px;font-size:12px;color:var(--color-accent-primary);text-decoration:none;text-align:center;">
+            View all pending →
+          </a>
+        </div>
+      ) : (
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:24px;text-align:center;">
+          <p style="font-size:13px;color:var(--color-text-muted);margin:0;">No pending comments</p>
+        </div>
+      )}
+    </div>
+  </div>
+</AdminLayout>

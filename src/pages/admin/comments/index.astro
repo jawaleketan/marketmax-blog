@@ -1,0 +1,115 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { getSupabaseServerClient } from "../../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = getSupabaseServerClient();
+const url = new URL(Astro.request.url);
+const filter = url.searchParams.get("filter") || "pending";
+
+let query = supabase.from("comments").select("*");
+
+if (filter === "pending") query = query.eq("approved", false);
+else if (filter === "approved") query = query.eq("approved", true);
+
+const { data: comments } = await query.order("created_at", { ascending: false });
+
+const { count: pendingCount } = await supabase
+  .from("comments")
+  .select("id", { count: "exact", head: true })
+  .eq("approved", false);
+
+const { count: approvedCount } = await supabase
+  .from("comments")
+  .select("id", { count: "exact", head: true })
+  .eq("approved", true);
+
+const { count: totalCount } = await supabase
+  .from("comments")
+  .select("id", { count: "exact", head: true });
+---
+
+<AdminLayout title="Comments">
+  <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0 0 20px;letter-spacing:-0.03em;">Comments</h1>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <a href="/admin/comments?filter=pending" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${filter === "pending" ? "background:rgba(245,158,11,0.1);color:#f59e0b;" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>
+      Pending ({pendingCount || 0})
+    </a>
+    <a href="/admin/comments?filter=approved" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${filter === "approved" ? "background:rgba(16,185,129,0.1);color:#10b981;" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>
+      Approved ({approvedCount || 0})
+    </a>
+    <a href="/admin/comments" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${filter === "all" ? "background:var(--color-accent-subtle);color:var(--color-accent-primary);" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>
+      All ({totalCount || 0})
+    </a>
+  </div>
+
+  {comments && comments.length > 0 ? (
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;overflow:hidden;">
+      {comments.map((comment) => (
+        <div style="padding:16px;border-bottom:1px solid var(--color-border-default);" id={`comment-${comment.id}`}>
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+            <div>
+              <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">{comment.author_name}</span>
+              {comment.author_email && (
+                <span style="font-size:11px;color:var(--color-text-muted);margin-left:8px;">{comment.author_email}</span>
+              )}
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <span style={`font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;${comment.approved ? "background:rgba(16,185,129,0.1);color:#10b981;" : "background:rgba(245,158,11,0.1);color:#f59e0b;"}`}>
+                {comment.approved ? "approved" : "pending"}
+              </span>
+              <span style="font-size:11px;color:var(--color-text-muted);">
+                {new Date(comment.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+              </span>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 8px;line-height:1.5;">{comment.body}</p>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:11px;color:var(--color-text-muted);">on <a href={`/blog/${comment.slug}`} style="color:var(--color-accent-primary);text-decoration:none;">{comment.slug}</a></span>
+            <div style="display:flex;gap:6px;">
+              {!comment.approved && (
+                <button onclick={`approveComment('${comment.id}')`} style="padding:4px 10px;border-radius:5px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.05);color:#10b981;font-size:11px;cursor:pointer;font-family:inherit;">Approve</button>
+              )}
+              {comment.approved && (
+                <button onclick={`unapproveComment('${comment.id}')`} style="padding:4px 10px;border-radius:5px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-muted);font-size:11px;cursor:pointer;font-family:inherit;">Unapprove</button>
+              )}
+              <button onclick={`deleteComment('${comment.id}')`} style="padding:4px 10px;border-radius:5px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);color:#ef4444;font-size:11px;cursor:pointer;font-family:inherit;">Delete</button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:40px;text-align:center;">
+      <p style="font-size:14px;color:var(--color-text-muted);margin:0;">No {filter === "pending" ? "pending " : ""}comments found</p>
+    </div>
+  )}
+
+  <script>
+    async function approveComment(id) {
+      await fetch(`/api/admin/comments/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved: true }),
+      });
+      window.location.reload();
+    }
+
+    async function unapproveComment(id) {
+      await fetch(`/api/admin/comments/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved: false }),
+      });
+      window.location.reload();
+    }
+
+    async function deleteComment(id) {
+      if (!confirm("Delete this comment?")) return;
+      await fetch(`/api/admin/comments/${id}`, { method: "DELETE" });
+      window.location.reload();
+    }
+  </script>
+</AdminLayout>

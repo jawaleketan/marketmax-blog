@@ -1,7 +1,5 @@
 ---
-import type { CollectionEntry } from "astro:content";
-
-export interface Props { post: CollectionEntry<"blog">; featured?: boolean; }
+export interface Props { post: any; featured?: boolean; }
 
 const { post, featured = false } = Astro.props;
 
@@ -16,10 +14,11 @@ const categoryStyles: Record<Category, { tag: string; label: string }> = {
 };
 
 const cat = categoryStyles[post.data.category as Category] || { tag: "bg-bg-hover text-text-muted border-border-default", label: post.data.category };
+const postSlug = post.slug || post.id;
 ---
 
 <article class={`card-bezel group relative flex flex-col ${featured ? "md:col-span-2 lg:col-span-2" : ""}`}>
-  <a href={`/blog/${post.id}`} class="flex flex-col flex-grow">
+  <a href={`/blog/${postSlug}`} class="flex flex-col flex-grow">
     {post.data.image && (
       <div class="aspect-[16/9] overflow-hidden bg-bg-surface">
         <img src={post.data.image} alt={post.data.title} class="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03]" loading="lazy" decoding="async" />

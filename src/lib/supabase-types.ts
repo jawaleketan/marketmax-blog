@@ -118,6 +118,114 @@ export interface Database {
           created_at?: string;
         };
       };
+      admins: {
+        Row: {
+          id: string;
+          email: string;
+          role: string;
+          created_at: string;
+        };
+        Insert: {
+          id: string;
+          email: string;
+          role?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          email?: string;
+          role?: string;
+          created_at?: string;
+        };
+      };
+      posts: {
+        Row: {
+          id: string;
+          title: string;
+          slug: string;
+          description: string;
+          content: string;
+          category: string;
+          tags: string[];
+          author: string;
+          image: string | null;
+          featured: boolean;
+          reading_time: string | null;
+          series: string | null;
+          status: string;
+          publish_date: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          slug: string;
+          description: string;
+          content?: string;
+          category: string;
+          tags?: string[];
+          author?: string;
+          image?: string | null;
+          featured?: boolean;
+          reading_time?: string | null;
+          series?: string | null;
+          status?: string;
+          publish_date?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          slug?: string;
+          description?: string;
+          content?: string;
+          category?: string;
+          tags?: string[];
+          author?: string;
+          image?: string | null;
+          featured?: boolean;
+          reading_time?: string | null;
+          series?: string | null;
+          status?: string;
+          publish_date?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      media: {
+        Row: {
+          id: string;
+          filename: string;
+          url: string;
+          alt_text: string;
+          file_size: number | null;
+          mime_type: string | null;
+          uploaded_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          filename: string;
+          url: string;
+          alt_text?: string;
+          file_size?: number | null;
+          mime_type?: string | null;
+          uploaded_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          filename?: string;
+          url?: string;
+          alt_text?: string;
+          file_size?: number | null;
+          mime_type?: string | null;
+          uploaded_by?: string | null;
+          created_at?: string;
+        };
+      };
     };
     Functions: {
       increment_view_count: {

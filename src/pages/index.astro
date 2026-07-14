@@ -6,11 +6,27 @@ import Hero from "../components/Hero.astro";
 import BlogCard from "../components/BlogCard.astro";
 import Newsletter from "../components/Newsletter.astro";
 import { getCollection } from "astro:content";
+import { getSupabasePosts } from "../lib/posts";
 
-const allPosts = await getCollection("blog");
-const sortedPosts = allPosts.sort((a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime());
-const featuredPost = sortedPosts.find((p) => p.data.featured) || sortedPosts[0];
-const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
+const [markdownPosts, supabasePosts] = await Promise.all([
+  getCollection("blog"),
+  getSupabasePosts(),
+]);
+
+const allPosts = [...markdownPosts, ...supabasePosts].sort(
+  (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime()
+);
+
+const featuredPost = allPosts.find((p) => p.data.featured) || allPosts[0];
+const recentPosts = allPosts.filter((p) => p.id !== featuredPost?.id).slice(0, 6);
+
+const categoryCounts = {
+  seo: allPosts.filter((p) => p.data.category === "seo").length,
+  "social-media": allPosts.filter((p) => p.data.category === "social-media").length,
+  "content-marketing": allPosts.filter((p) => p.data.category === "content-marketing").length,
+  ppc: allPosts.filter((p) => p.data.category === "ppc").length,
+  analytics: allPosts.filter((p) => p.data.category === "analytics").length,
+};
 ---
 
 <BaseLayout title="MarketMax, Digital Marketing Insights" description="Digital marketing blog by Ketan Jawale. Learn SEO, social media, content marketing, PPC, and analytics with actionable guides.">
@@ -29,7 +45,7 @@ const recentPosts = sortedPosts.filter((p) => p.id !== featuredPost?.id).slice(0
     <section class="container-blog py-6 sm:py-8">
       <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
         {(["seo", "social-media", "content-marketing", "ppc", "analytics"] as const).map((cat) => {
-          const count = allPosts.filter((p) => p.data.category === cat).length;
+          const count = categoryCounts[cat];
           const labels = { seo: "SEO", "social-media": "Social", "content-marketing": "Content", ppc: "PPC", analytics: "Analytics" };
           const colors = {
             seo: "border-tag-seo/20 text-tag-seo bg-tag-seo/5 hover:bg-tag-seo/10",

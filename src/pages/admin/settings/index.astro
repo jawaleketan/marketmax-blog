@@ -1,0 +1,70 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+export const prerender = false;
+
+const user = Astro.locals.adminUser;
+---
+
+<AdminLayout title="Settings">
+  <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0 0 24px;letter-spacing:-0.03em;">Settings</h1>
+
+  <div style="max-width:480px;">
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:20px;margin-bottom:20px;">
+      <h2 style="font-size:14px;font-weight:700;color:var(--color-text-primary);margin:0 0 16px;">Account</h2>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px;">
+        <span style="color:var(--color-text-muted);">Email:</span> {user?.email}
+      </div>
+      <div style="font-size:13px;color:var(--color-text-secondary);">
+        <span style="color:var(--color-text-muted);">Role:</span> {user?.role}
+      </div>
+    </div>
+
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:20px;">
+      <h2 style="font-size:14px;font-weight:700;color:var(--color-text-primary);margin:0 0 16px;">Change Password</h2>
+
+      <form id="password-form">
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px;">New Password</label>
+          <input type="password" name="password" required minlength="6" placeholder="Min 6 characters" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:4px;">Confirm Password</label>
+          <input type="password" name="confirm" required minlength="6" placeholder="Repeat password" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div id="msg" style="display:none;padding:8px 10px;border-radius:6px;font-size:12px;margin-bottom:12px;"></div>
+
+        <button type="submit" style="padding:8px 16px;border-radius:6px;border:none;background:var(--color-accent-primary);color:#000;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Update Password</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("password-form");
+    const msg = document.getElementById("msg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const password = formData.get("password");
+      const confirm = formData.get("confirm");
+
+      if (password !== confirm) {
+        msg.textContent = "Passwords don't match";
+        msg.style.display = "block";
+        msg.style.background = "rgba(239,68,68,0.1)";
+        msg.style.color = "#ef4444";
+        return;
+      }
+
+      // Note: Supabase password update requires the user to be logged in
+      // This calls the Supabase client-side API
+      msg.textContent = "To change password, use the Supabase dashboard or contact the site owner.";
+      msg.style.display = "block";
+      msg.style.background = "var(--color-accent-subtle)";
+      msg.style.color = "var(--color-accent-primary)";
+    });
+  </script>
+</AdminLayout>

@@ -1,0 +1,175 @@
+---
+import AdminLayout from "../../../../layouts/AdminLayout.astro";
+import PostEditor from "../../../../components/admin/PostEditor.astro";
+import { getSupabaseServerClient } from "../../../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = getSupabaseServerClient();
+const { id } = Astro.params;
+
+const { data: post, error } = await supabase
+  .from("posts")
+  .select("*")
+  .eq("id", id)
+  .single();
+
+if (error || !post) {
+  return Astro.redirect("/admin/posts");
+}
+---
+
+<AdminLayout title={post.title}>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0;letter-spacing:-0.03em;">Edit Post</h1>
+    <a href="/admin/posts" style="font-size:13px;color:var(--color-text-muted);text-decoration:none;">← Back to Posts</a>
+  </div>
+
+  <form id="post-form" style="display:grid;grid-template-columns:1fr 300px;gap:24px;">
+    <div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Title</label>
+        <input type="text" name="title" required value={post.title} style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:16px;font-weight:600;font-family:inherit;outline:none;box-sizing:border-box;" />
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Description</label>
+        <textarea name="description" required rows="2" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:14px;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;">{post.description}</textarea>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Content</label>
+        <PostEditor content={post.content} />
+      </div>
+    </div>
+
+    <div>
+      <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:16px;position:sticky;top:80px;">
+        <h3 style="font-size:13px;font-weight:700;color:var(--color-text-primary);margin:0 0 16px;">Post Settings</h3>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Status</label>
+          <select name="status" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;">
+            <option value="draft" selected={post.status === "draft"}>Draft</option>
+            <option value="published" selected={post.status === "published"}>Published</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Category</label>
+          <select name="category" required style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;">
+            <option value="seo" selected={post.category === "seo"}>SEO</option>
+            <option value="social-media" selected={post.category === "social-media"}>Social Media</option>
+            <option value="content-marketing" selected={post.category === "content-marketing"}>Content Marketing</option>
+            <option value="ppc" selected={post.category === "ppc"}>PPC</option>
+            <option value="analytics" selected={post.category === "analytics"}>Analytics</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Tags (comma separated)</label>
+          <input type="text" name="tags" value={post.tags?.join(", ") || ""} style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Featured Image URL</label>
+          <input type="text" name="image" value={post.image || ""} style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Reading Time</label>
+          <input type="text" name="reading_time" value={post.reading_time || ""} style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Series</label>
+          <input type="text" name="series" value={post.series || ""} style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" name="featured" checked={post.featured} style="accent-color:var(--color-accent-primary);" />
+            <span style="font-size:12px;color:var(--color-text-secondary);">Featured post</span>
+          </label>
+        </div>
+
+        <div style="font-size:11px;color:var(--color-text-muted);margin-bottom:12px;">
+          Created: {new Date(post.created_at).toLocaleDateString()}<br/>
+          Updated: {new Date(post.updated_at).toLocaleDateString()}
+        </div>
+
+        <div id="error-msg" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;padding:8px 10px;border-radius:6px;font-size:12px;margin-bottom:12px;"></div>
+
+        <button type="submit" id="save-btn" style="width:100%;padding:10px;border-radius:8px;border:none;background:var(--color-accent-primary);color:#000;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px;">
+          Update Post
+        </button>
+        <button type="button" onclick={`togglePublish('${post.status}')`} style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;cursor:pointer;font-family:inherit;">
+          {post.status === "published" ? "Unpublish" : "Publish Now"}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <script define:vars={{ postId: id, currentStatus: post.status }}>
+    const form = document.getElementById("post-form");
+    const errorMsg = document.getElementById("error-msg");
+    const saveBtn = document.getElementById("save-btn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = "none";
+      saveBtn.textContent = "Updating...";
+      saveBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const body = {
+        title: formData.get("title"),
+        description: formData.get("description"),
+        content: document.getElementById("editor-content").value,
+        category: formData.get("category"),
+        tags: formData.get("tags") ? formData.get("tags").split(",").map(t => t.trim()).filter(Boolean) : [],
+        status: formData.get("status"),
+        image: formData.get("image") || null,
+        featured: formData.has("featured"),
+        reading_time: formData.get("reading_time") || null,
+        series: formData.get("series") || null,
+      };
+
+      try {
+        const res = await fetch(`/api/admin/posts/${postId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.textContent = data.error || "Failed to update post";
+          errorMsg.style.display = "block";
+          saveBtn.textContent = "Update Post";
+          saveBtn.disabled = false;
+          return;
+        }
+
+        saveBtn.textContent = "Updated!";
+        setTimeout(() => { saveBtn.textContent = "Update Post"; saveBtn.disabled = false; }, 2000);
+      } catch (err) {
+        errorMsg.textContent = "Network error. Please try again.";
+        errorMsg.style.display = "block";
+        saveBtn.textContent = "Update Post";
+        saveBtn.disabled = false;
+      }
+    });
+
+    async function togglePublish(status) {
+      const newStatus = status === "published" ? "draft" : "published";
+      await fetch(`/api/admin/posts/${postId}/publish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      window.location.reload();
+    }
+  </script>
+</AdminLayout>

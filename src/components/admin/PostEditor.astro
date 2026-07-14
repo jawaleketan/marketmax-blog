@@ -1,0 +1,166 @@
+---
+interface Props {
+  content?: string;
+}
+
+const { content = "" } = Astro.props;
+---
+
+<div id="editor-wrapper">
+  <div id="toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:8px 12px;border-bottom:1px solid var(--color-border-default);background:var(--color-bg-surface);border-radius:10px 10px 0 0;">
+    <button type="button" data-command="bold" class="toolbar-btn" title="Bold (Ctrl+B)"><strong>B</strong></button>
+    <button type="button" data-command="italic" class="toolbar-btn" title="Italic (Ctrl+I)"><em>I</em></button>
+    <button type="button" data-command="strike" class="toolbar-btn" title="Strikethrough"><s>S</s></button>
+    <span class="toolbar-sep"></span>
+    <button type="button" data-command="h2" class="toolbar-btn" title="Heading 2">H2</button>
+    <button type="button" data-command="h3" class="toolbar-btn" title="Heading 3">H3</button>
+    <span class="toolbar-sep"></span>
+    <button type="button" data-command="bulletList" class="toolbar-btn" title="Bullet List">• List</button>
+    <button type="button" data-command="orderedList" class="toolbar-btn" title="Ordered List">1. List</button>
+    <button type="button" data-command="blockquote" class="toolbar-btn" title="Blockquote">"</button>
+    <span class="toolbar-sep"></span>
+    <button type="button" data-command="link" class="toolbar-btn" title="Insert Link">🔗</button>
+    <button type="button" data-command="image" class="toolbar-btn" title="Insert Image">🖼</button>
+    <button type="button" data-command="codeBlock" class="toolbar-btn" title="Code Block">&lt;/&gt;</button>
+    <button type="button" data-command="code" class="toolbar-btn" title="Inline Code">&lt;&gt;</button>
+    <span class="toolbar-sep"></span>
+    <button type="button" data-command="undo" class="toolbar-btn" title="Undo">↩</button>
+    <button type="button" data-command="redo" class="toolbar-btn" title="Redo">↪</button>
+  </div>
+  <div id="editor" style="min-height:400px;padding:16px;background:var(--color-bg-card);border:1px solid var(--color-border-default);border-top:none;border-radius:0 0 10px 10px;color:var(--color-text-primary);font-size:15px;line-height:1.7;outline:none;"></div>
+</div>
+
+<textarea name="content" id="editor-content" style="display:none;">{content}</textarea>
+
+<style>
+  .toolbar-btn {
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.15s;
+    min-width: 28px;
+    text-align: center;
+  }
+  .toolbar-btn:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-primary);
+  }
+  .toolbar-btn.active {
+    background: var(--color-accent-subtle);
+    color: var(--color-accent-primary);
+  }
+  .toolbar-sep {
+    width: 1px;
+    background: var(--color-border-default);
+    margin: 4px 4px;
+  }
+  #editor :global(h2) { font-size: 20px; font-weight: 700; margin: 20px 0 10px; }
+  #editor :global(h3) { font-size: 17px; font-weight: 600; margin: 16px 0 8px; }
+  #editor :global(p) { margin: 0 0 10px; }
+  #editor :global(ul), #editor :global(ol) { padding-left: 24px; margin: 8px 0; }
+  #editor :global(blockquote) {
+    border-left: 3px solid var(--color-accent-primary);
+    padding-left: 16px;
+    margin: 12px 0;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+  #editor :global(pre) {
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    border-radius: 6px;
+    padding: 12px;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-x: auto;
+    margin: 12px 0;
+  }
+  #editor :global(code) {
+    background: var(--color-bg-surface);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+  #editor :global(pre code) { background: none; padding: 0; }
+  #editor :global(a) { color: var(--color-accent-primary); text-decoration: underline; }
+  #editor :global(img) { max-width: 100%; border-radius: 8px; margin: 12px 0; }
+  #editor :global(.is-empty::before) {
+    content: attr(data-placeholder);
+    color: var(--color-text-muted);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { Editor } from "@tiptap/core";
+  import StarterKit from "@tiptap/starter-kit";
+  import Link from "@tiptap/extension-link";
+  import Image from "@tiptap/extension-image";
+  import Placeholder from "@tiptap/extension-placeholder";
+
+  const savedContent = document.getElementById("editor-content")?.textContent || "";
+
+  const editor = new Editor({
+    element: document.getElementById("editor"),
+    extensions: [
+      StarterKit.configure({
+        heading: { levels: [2, 3] },
+      }),
+      Link.configure({ openOnClick: false }),
+      Image,
+      Placeholder.configure({ placeholder: "Start writing your post..." }),
+    ],
+    content: savedContent,
+    editorProps: {
+      attributes: {
+        class: "prose-editor",
+      },
+    },
+    onUpdate: ({ editor }) => {
+      document.getElementById("editor-content").value = editor.getHTML();
+    },
+  });
+
+  document.getElementById("editor-content").value = editor.getHTML();
+
+  document.querySelectorAll(".toolbar-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const command = btn.getAttribute("data-command");
+
+      switch (command) {
+        case "bold": editor.chain().focus().toggleBold().run(); break;
+        case "italic": editor.chain().focus().toggleItalic().run(); break;
+        case "strike": editor.chain().focus().toggleStrike().run(); break;
+        case "h2": editor.chain().focus().toggleHeading({ level: 2 }).run(); break;
+        case "h3": editor.chain().focus().toggleHeading({ level: 3 }).run(); break;
+        case "bulletList": editor.chain().focus().toggleBulletList().run(); break;
+        case "orderedList": editor.chain().focus().toggleOrderedList().run(); break;
+        case "blockquote": editor.chain().focus().toggleBlockquote().run(); break;
+        case "codeBlock": editor.chain().focus().toggleCodeBlock().run(); break;
+        case "code": editor.chain().focus().toggleCode().run(); break;
+        case "undo": editor.chain().focus().undo().run(); break;
+        case "redo": editor.chain().focus().redo().run(); break;
+        case "link": {
+          const url = prompt("Enter URL:");
+          if (url) editor.chain().focus().setLink({ href: url }).run();
+          break;
+        }
+        case "image": {
+          const url = prompt("Enter image URL:");
+          if (url) editor.chain().focus().setImage({ src: url }).run();
+          break;
+        }
+      }
+    });
+  });
+
+  (window as any).__tiptapEditor = editor;
+</script>

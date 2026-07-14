@@ -1,0 +1,149 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import PostEditor from "../../../components/admin/PostEditor.astro";
+
+export const prerender = false;
+---
+
+<AdminLayout title="New Post">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0;letter-spacing:-0.03em;">New Post</h1>
+    <a href="/admin/posts" style="font-size:13px;color:var(--color-text-muted);text-decoration:none;">← Back to Posts</a>
+  </div>
+
+  <form id="post-form" style="display:grid;grid-template-columns:1fr 300px;gap:24px;">
+    <div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Title</label>
+        <input type="text" name="title" required placeholder="Your post title..." style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:16px;font-weight:600;font-family:inherit;outline:none;box-sizing:border-box;" />
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Description</label>
+        <textarea name="description" required rows="2" placeholder="Brief description for SEO and previews..." style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:14px;font-family:inherit;outline:none;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Content</label>
+        <PostEditor />
+      </div>
+    </div>
+
+    <div>
+      <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:16px;position:sticky;top:80px;">
+        <h3 style="font-size:13px;font-weight:700;color:var(--color-text-primary);margin:0 0 16px;">Post Settings</h3>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Status</label>
+          <select name="status" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Category</label>
+          <select name="category" required style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;">
+            <option value="seo">SEO</option>
+            <option value="social-media">Social Media</option>
+            <option value="content-marketing">Content Marketing</option>
+            <option value="ppc">PPC</option>
+            <option value="analytics">Analytics</option>
+          </select>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Tags (comma separated)</label>
+          <input type="text" name="tags" placeholder="seo, marketing, tips" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Featured Image URL</label>
+          <input type="text" name="image" placeholder="https://..." style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Reading Time</label>
+          <input type="text" name="reading_time" placeholder="5 min read" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-size:11px;font-weight:600;color:var(--color-text-muted);margin-bottom:4px;">Series</label>
+          <input type="text" name="series" placeholder="SEO Basics" style="width:100%;padding:8px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;" />
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+            <input type="checkbox" name="featured" style="accent-color:var(--color-accent-primary);" />
+            <span style="font-size:12px;color:var(--color-text-secondary);">Featured post</span>
+          </label>
+        </div>
+
+        <div id="error-msg" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;padding:8px 10px;border-radius:6px;font-size:12px;margin-bottom:12px;"></div>
+
+        <button type="submit" id="save-btn" style="width:100%;padding:10px;border-radius:8px;border:none;background:var(--color-accent-primary);color:#000;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">
+          Save Post
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <script>
+    const form = document.getElementById("post-form");
+    const errorMsg = document.getElementById("error-msg");
+    const saveBtn = document.getElementById("save-btn");
+
+    function slugify(text) {
+      return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorMsg.style.display = "none";
+      saveBtn.textContent = "Saving...";
+      saveBtn.disabled = true;
+
+      const formData = new FormData(form);
+      const title = formData.get("title");
+
+      const body = {
+        title,
+        slug: slugify(title),
+        description: formData.get("description"),
+        content: document.getElementById("editor-content").value,
+        category: formData.get("category"),
+        tags: formData.get("tags") ? formData.get("tags").split(",").map(t => t.trim()).filter(Boolean) : [],
+        status: formData.get("status"),
+        image: formData.get("image") || null,
+        featured: formData.has("featured"),
+        reading_time: formData.get("reading_time") || null,
+        series: formData.get("series") || null,
+      };
+
+      try {
+        const res = await fetch("/api/admin/posts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.textContent = data.error || "Failed to save post";
+          errorMsg.style.display = "block";
+          saveBtn.textContent = "Save Post";
+          saveBtn.disabled = false;
+          return;
+        }
+
+        window.location.href = `/admin/posts/${data.post.id}/edit`;
+      } catch (err) {
+        errorMsg.textContent = "Network error. Please try again.";
+        errorMsg.style.display = "block";
+        saveBtn.textContent = "Save Post";
+        saveBtn.disabled = false;
+      }
+    });
+  </script>
+</AdminLayout>

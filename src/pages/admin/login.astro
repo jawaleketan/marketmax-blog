@@ -1,0 +1,134 @@
+---
+import "../../styles/global.css";
+
+const user = Astro.locals.adminUser;
+if (user) {
+  return Astro.redirect("/admin");
+}
+---
+
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Login | MarketMax Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      (function() {
+        const saved = localStorage.getItem("theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const theme = saved || (prefersLight ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--color-bg-base);font-family:'Plus Jakarta Sans',sans-serif;">
+    <div style="width:100%;max-width:380px;padding:24px;">
+      <div style="text-align:center;margin-bottom:32px;">
+        <a href="/" style="color:var(--color-text-primary);text-decoration:none;font-weight:800;font-size:18px;letter-spacing:-0.03em;">
+          <span style="color:var(--color-accent-primary);font-family:monospace;">&gt;</span> marketmax
+        </a>
+        <p style="color:var(--color-text-muted);font-size:13px;margin-top:8px;">Admin Panel</p>
+      </div>
+
+      <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:12px;padding:24px;">
+        <h1 style="font-size:16px;font-weight:700;color:var(--color-text-primary);margin:0 0 20px;">Sign in to your account</h1>
+
+        <form id="login-form">
+          <div style="margin-bottom:16px;">
+            <label for="email" style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              autocomplete="email"
+              placeholder="admin@example.com"
+              style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.15s;box-sizing:border-box;"
+              onfocus="this.style.borderColor='var(--color-accent-primary)'"
+              onblur="this.style.borderColor='var(--color-border-default)'"
+            />
+          </div>
+
+          <div style="margin-bottom:20px;">
+            <label for="password" style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              placeholder="••••••••"
+              style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-primary);font-size:14px;font-family:inherit;outline:none;transition:border-color 0.15s;box-sizing:border-box;"
+              onfocus="this.style.borderColor='var(--color-accent-primary)'"
+              onblur="this.style.borderColor='var(--color-border-default)'"
+            />
+          </div>
+
+          <div id="error-msg" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;"></div>
+
+          <button
+            type="submit"
+            id="submit-btn"
+            style="width:100%;padding:10px;border-radius:8px;border:none;background:var(--color-accent-primary);color:#000;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background 0.15s;"
+            onmouseover="this.style.background='var(--color-accent-hover)'"
+            onmouseout="this.style.background='var(--color-accent-primary)'"
+          >
+            Sign In
+          </button>
+        </form>
+      </div>
+
+      <p style="text-align:center;font-size:12px;color:var(--color-text-muted);margin-top:20px;">
+        <a href="/" style="color:var(--color-text-muted);text-decoration:underline;">← Back to site</a>
+      </p>
+    </div>
+
+    <script>
+      const form = document.getElementById("login-form");
+      const errorMsg = document.getElementById("error-msg");
+      const submitBtn = document.getElementById("submit-btn");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorMsg.style.display = "none";
+        submitBtn.textContent = "Signing in...";
+        submitBtn.disabled = true;
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          const res = await fetch("/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            errorMsg.textContent = data.error || "Login failed";
+            errorMsg.style.display = "block";
+            submitBtn.textContent = "Sign In";
+            submitBtn.disabled = false;
+            return;
+          }
+
+          document.cookie = "sb-access-token=" + data.access_token + "; path=/; max-age=604800; samesite=lax";
+          document.cookie = "sb-refresh-token=" + data.refresh_token + "; path=/; max-age=604800; samesite=lax";
+
+          window.location.href = "/admin";
+        } catch (err) {
+          errorMsg.textContent = "Network error. Please try again.";
+          errorMsg.style.display = "block";
+          submitBtn.textContent = "Sign In";
+          submitBtn.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

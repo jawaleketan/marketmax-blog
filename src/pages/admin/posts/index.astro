@@ -1,0 +1,125 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+import { getSupabaseServerClient } from "../../../lib/supabase";
+
+export const prerender = false;
+
+const supabase = getSupabaseServerClient();
+const url = new URL(Astro.request.url);
+const status = url.searchParams.get("status") || "all";
+const search = url.searchParams.get("q") || "";
+const page = parseInt(url.searchParams.get("page") || "1");
+const limit = 10;
+const offset = (page - 1) * limit;
+
+let query = supabase.from("posts").select("*", { count: "exact" });
+
+if (status === "published") query = query.eq("status", "published");
+else if (status === "draft") query = query.eq("status", "draft");
+
+if (search) {
+  query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+}
+
+const { data: posts, count } = await query
+  .order("created_at", { ascending: false })
+  .range(offset, offset + limit - 1);
+
+const totalPages = Math.ceil((count || 0) / limit);
+
+const categoryColors: Record<string, string> = {
+  "seo": "var(--color-tag-seo)",
+  "social-media": "var(--color-tag-social)",
+  "content-marketing": "var(--color-tag-content)",
+  "ppc": "var(--color-tag-ppc)",
+  "analytics": "var(--color-tag-analytics)",
+};
+---
+
+<AdminLayout title="Posts">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+    <h1 style="font-size:24px;font-weight:800;color:var(--color-text-primary);margin:0;letter-spacing:-0.03em;">Posts</h1>
+    <a href="/admin/posts/new" style="padding:8px 16px;border-radius:8px;background:var(--color-accent-primary);color:#000;font-size:13px;font-weight:600;text-decoration:none;">+ New Post</a>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <a href="/admin/posts" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${status === "all" ? "background:var(--color-accent-subtle);color:var(--color-accent-primary);" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>All ({count || 0})</a>
+    <a href="/admin/posts?status=published" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${status === "published" ? "background:rgba(16,185,129,0.1);color:#10b981;" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>Published</a>
+    <a href="/admin/posts?status=draft" style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${status === "draft" ? "background:rgba(245,158,11,0.1);color:#f59e0b;" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>Drafts</a>
+  </div>
+
+  <form method="GET" style="margin-bottom:16px;">
+    <input type="hidden" name="status" value={status} />
+    <div style="display:flex;gap:8px;">
+      <input type="text" name="q" value={search} placeholder="Search posts..." style="flex:1;padding:8px 12px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:13px;font-family:inherit;outline:none;" />
+      <button type="submit" style="padding:8px 16px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-card);color:var(--color-text-primary);font-size:13px;cursor:pointer;">Search</button>
+    </div>
+  </form>
+
+  {posts && posts.length > 0 ? (
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;overflow:hidden;">
+      {posts.map((post) => (
+        <div style="padding:16px;border-bottom:1px solid var(--color-border-default);display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div style="flex:1;min-width:0;">
+            <a href={`/admin/posts/${post.id}/edit`} style="font-size:14px;font-weight:600;color:var(--color-text-primary);text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              {post.title}
+            </a>
+            <div style="display:flex;gap:8px;margin-top:6px;align-items:center;flex-wrap:wrap;">
+              <span style={`font-size:10px;padding:2px 6px;border-radius:4px;background:${categoryColors[post.category] || "var(--color-text-muted)"}22;color:${categoryColors[post.category] || "var(--color-text-muted)"};font-weight:600;`}>
+                {post.category}
+              </span>
+              <span style={`font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600;${post.status === "published" ? "background:rgba(16,185,129,0.1);color:#10b981;" : "background:rgba(245,158,11,0.1);color:#f59e0b;"}`}>
+                {post.status}
+              </span>
+              {post.featured && (
+                <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(245,158,11,0.1);color:#f59e0b;font-weight:600;">featured</span>
+              )}
+              <span style="font-size:11px;color:var(--color-text-muted);">
+                {new Date(post.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+              </span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0;">
+            <a href={`/admin/posts/${post.id}/edit`} style="padding:6px 10px;border-radius:6px;background:var(--color-bg-surface);color:var(--color-text-secondary);font-size:12px;text-decoration:none;border:1px solid var(--color-border-default);">Edit</a>
+            <button onclick={`togglePublish('${post.id}', '${post.status}')`} style="padding:6px 10px;border-radius:6px;border:1px solid var(--color-border-default);background:var(--color-bg-surface);color:var(--color-text-secondary);font-size:12px;cursor:pointer;font-family:inherit;">
+              {post.status === "published" ? "Unpublish" : "Publish"}
+            </button>
+            <button onclick={`deletePost('${post.id}')`} style="padding:6px 10px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.05);color:#ef4444;font-size:12px;cursor:pointer;font-family:inherit;">Delete</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div style="background:var(--color-bg-card);border:1px solid var(--color-border-default);border-radius:10px;padding:40px;text-align:center;">
+      <p style="font-size:14px;color:var(--color-text-muted);margin:0;">No posts found. <a href="/admin/posts/new" style="color:var(--color-accent-primary);">Create your first post</a></p>
+    </div>
+  )}
+
+  {totalPages > 1 && (
+    <div style="display:flex;justify-content:center;gap:6px;margin-top:20px;">
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <a href={`/admin/posts?page=${p}&status=${status}&q=${search}`} style={`padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;${p === page ? "background:var(--color-accent-primary);color:#000;" : "background:var(--color-bg-card);color:var(--color-text-muted);border:1px solid var(--color-border-default);"}`}>
+          {p}
+        </a>
+      ))}
+    </div>
+  )}
+
+  <script>
+    async function togglePublish(id, currentStatus) {
+      const newStatus = currentStatus === "published" ? "draft" : "published";
+      await fetch(`/api/admin/posts/${id}/publish`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      window.location.reload();
+    }
+
+    async function deletePost(id) {
+      if (!confirm("Are you sure you want to delete this post?")) return;
+      await fetch(`/api/admin/posts/${id}`, { method: "DELETE" });
+      window.location.reload();
+    }
+  </script>
+</AdminLayout>
